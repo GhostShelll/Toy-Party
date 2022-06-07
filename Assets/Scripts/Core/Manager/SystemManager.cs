@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using UnityEngine;
+
 namespace com.jbg.core.manager
 {
     using Manager = SystemManager;
@@ -8,6 +10,7 @@ namespace com.jbg.core.manager
     public class SystemManager
     {
         public static bool IsOpened { private set; get; }
+        public static bool IsPaused { private set; get; }
 
         private static readonly List<string> openList = new(1024);
 
@@ -22,7 +25,7 @@ namespace com.jbg.core.manager
 
             Manager.AddOpenList(CLASSNAME);
 
-            // 각종 매니저 오픈
+            // 각종 매니저 오픈 함수 실행
         }
 
         public static void Close()
@@ -35,12 +38,56 @@ namespace com.jbg.core.manager
 
                 Manager.RemoveOpenList(CLASSNAME);
 
-                // 각종 매니저 클로즈
+                // 각종 매니저 클로즈 함수 실행
             }
 
             // 닫히지 않은 매니저를 알아낸다
             DebugEx.Log(Manager.OpenListToString);
             Manager.ClearOpenList();
+        }
+
+        public static void Update()
+        {
+            if (Manager.IsOpened == false)
+                return;
+
+            try
+            {
+                // 각종 매니저 업데이트 함수 실행
+            }
+            catch (System.Exception e)
+            {
+                DebugEx.LogError(e);
+#if LOG_DEBUG
+                // TODO[jbg] : 에러 팝업 연출
+                //ViewControl.OpenDebugPopup(e.GetType().Name, e.Message, e.StackTrace, (pop, btn) => { SystemControl.Reset(); });
+#endif  // LOG_DEBUG
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                // TODO[jbg] : 백버튼 처리
+            }
+        }
+
+        public static void OnApplicationPause()
+        {
+            if (Manager.IsPaused == false)
+            {
+                DebugEx.Log("SYSTEMMANAGER::ON_APPLICATION_PAUSE");
+
+                Manager.IsPaused = true;
+            }
+        }
+
+        public static void OnApplicationResume()
+        {
+            if (Manager.IsPaused)
+            {
+                DebugEx.Log("SYSTEMMANAGER::ON_APPLICATION_RESUME");
+
+                Manager.IsPaused = false;
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -34,6 +34,7 @@ namespace com.jbg.core.manager
         private void Start()
         {
             SystemManager.Open();
+            // TODO[jbg] : 첫번째 씬 열기
         }
 
         private void OnDestroy()
@@ -43,7 +44,15 @@ namespace com.jbg.core.manager
 
         private void Update()
         {
+            SystemManager.Update();
+        }
 
+        private void OnApplicationPause(bool pause)
+        {
+            if (pause)
+                SystemManager.OnApplicationPause();
+            else
+                SystemManager.OnApplicationResume();
         }
 
 #if UNITY_EDITOR
