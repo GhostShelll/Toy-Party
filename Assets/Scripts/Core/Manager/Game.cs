@@ -17,6 +17,7 @@ namespace com.jbg.core.manager
         {
             DebugEx.Log("GAME::AWAKE");
 
+#if LOG_DEBUG
             System.Text.StringBuilder pathLog = new();
             pathLog.AppendLine();
             pathLog.Append("Application.dataPath\t\t: ").AppendLine(Application.dataPath);
@@ -24,6 +25,7 @@ namespace com.jbg.core.manager
             pathLog.Append("Application.persistentDataPath\t: ").AppendLine(Application.persistentDataPath);
             pathLog.Append("Application.temporaryCachePath\t: ").Append(Application.temporaryCachePath);
             DebugEx.LogColor(pathLog, "#F699CD");
+#endif  // LOG_DEBUG
 
             GameObject.DontDestroyOnLoad(this.gameObject);
 

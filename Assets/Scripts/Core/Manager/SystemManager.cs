@@ -9,8 +9,8 @@ namespace com.jbg.core.manager
 
     public class SystemManager
     {
-        public static bool IsOpened { private set; get; }
-        public static bool IsPaused { private set; get; }
+        public static bool IsOpened { get; private set; }
+        public static bool IsPaused { get; private set; }
 
         private static readonly List<string> openList = new(1024);
 
