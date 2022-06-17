@@ -3,6 +3,8 @@ using System.Diagnostics;
 
 using UnityEngine;
 
+using com.jbg.core.scene;
+
 namespace com.jbg.core.manager
 {
     using Manager = SystemManager;
@@ -26,6 +28,7 @@ namespace com.jbg.core.manager
             Manager.AddOpenList(CLASSNAME);
 
             // 각종 매니저 오픈 함수 실행
+            SceneExManager.Open();
         }
 
         public static void Close()
@@ -39,6 +42,7 @@ namespace com.jbg.core.manager
                 Manager.RemoveOpenList(CLASSNAME);
 
                 // 각종 매니저 클로즈 함수 실행
+                SceneExManager.Close();
             }
 
             // 닫히지 않은 매니저를 알아낸다
@@ -54,6 +58,7 @@ namespace com.jbg.core.manager
             try
             {
                 // 각종 매니저 업데이트 함수 실행
+                SceneExManager.Update();
             }
             catch (System.Exception e)
             {
@@ -66,7 +71,8 @@ namespace com.jbg.core.manager
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                // TODO[jbg] : 백버튼 처리
+                // 백버튼 처리
+                SceneExManager.Back();
             }
         }
 
@@ -77,6 +83,8 @@ namespace com.jbg.core.manager
                 DebugEx.Log("SYSTEMMANAGER::ON_APPLICATION_PAUSE");
 
                 Manager.IsPaused = true;
+
+                SceneExManager.AppSuspend();
             }
         }
 
@@ -87,6 +95,8 @@ namespace com.jbg.core.manager
                 DebugEx.Log("SYSTEMMANAGER::ON_APPLICATION_RESUME");
 
                 Manager.IsPaused = false;
+
+                SceneExManager.AppResume();
             }
         }
 
