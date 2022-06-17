@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 #endif
 
+using com.jbg.core.scene;
+
 namespace com.jbg.core.manager
 {
     public class Game : MonoBehaviour
@@ -17,6 +19,7 @@ namespace com.jbg.core.manager
         {
             DebugEx.Log("GAME::AWAKE");
 
+#if LOG_DEBUG
             System.Text.StringBuilder pathLog = new();
             pathLog.AppendLine();
             pathLog.Append("Application.dataPath\t\t: ").AppendLine(Application.dataPath);
@@ -24,6 +27,7 @@ namespace com.jbg.core.manager
             pathLog.Append("Application.persistentDataPath\t: ").AppendLine(Application.persistentDataPath);
             pathLog.Append("Application.temporaryCachePath\t: ").Append(Application.temporaryCachePath);
             DebugEx.LogColor(pathLog, "#F699CD");
+#endif  // LOG_DEBUG
 
             GameObject.DontDestroyOnLoad(this.gameObject);
 
@@ -34,7 +38,8 @@ namespace com.jbg.core.manager
         private void Start()
         {
             SystemManager.Open();
-            // TODO[jbg] : 첫번째 씬 열기
+
+            SceneExManager.OpenScene(SceneExManager.SceneType.Title);   // 첫번째 씬은 타이틀 부터
         }
 
         private void OnDestroy()
