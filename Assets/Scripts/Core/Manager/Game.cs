@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 #endif
 
+using com.jbg.core.scene;
+
 namespace com.jbg.core.manager
 {
     public class Game : MonoBehaviour
@@ -36,7 +38,8 @@ namespace com.jbg.core.manager
         private void Start()
         {
             SystemManager.Open();
-            // TODO[jbg] : 첫번째 씬 열기
+
+            SceneExManager.OpenScene(SceneExManager.SceneType.Title);   // 첫번째 씬은 타이틀 부터
         }
 
         private void OnDestroy()
