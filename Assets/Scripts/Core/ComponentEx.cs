@@ -11,8 +11,6 @@ namespace com.jbg.core
         bool setComponentChild = false;
 #endif  // UNITY_EDITOR
 
-        private Transform cachedTransform = null;
-
         public virtual void Active()
         {
             this.gameObject.SetActive(true);
@@ -38,35 +36,25 @@ namespace com.jbg.core
         {
             get
             {
-                this.InitCachedTransform();
-
-                return this.cachedTransform;
+                return this.transform;
             }
-        }
-
-        private void InitCachedTransform()
-        {
-            if (this.cachedTransform != null)
-                return;
-
-            this.cachedTransform = this.transform;
         }
 
         public virtual void Show()
         {
-            this.cachedTransform.ShowTransform();
+            this.transform.ShowTransform();
         }
 
         public virtual void Hide()
         {
-            this.cachedTransform.HideTransform();
+            this.transform.HideTransform();
         }
 
         public bool IsShow
         {
             get
             {
-                return this.cachedTransform.IsHideTransform() == false;
+                return this.transform.IsHideTransform() == false;
             }
         }
 
@@ -92,7 +80,7 @@ namespace com.jbg.core
             {
                 this.setComponentChild = false;
 
-                ComponentEx[] childs = this.cachedTransform.GetComponentsInChildren<ComponentEx>();
+                ComponentEx[] childs = this.transform.GetComponentsInChildren<ComponentEx>();
                 for (int i = 0; i < childs.Length; i++)
                 {
                     ComponentEx child = childs[i];
@@ -108,7 +96,7 @@ namespace com.jbg.core
         {
             this.OnSetComponent();
 
-            UnityEx.SetDirtyAll(this.cachedTransform);
+            UnityEx.SetDirtyAll(this.transform);
         }
 
         protected virtual void OnSetComponent() { }
