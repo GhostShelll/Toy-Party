@@ -69,6 +69,33 @@ namespace com.jbg.core
                 DebugEx.LogWarning("NULL TRANSFORM!!");
             }
         }
+
+        public static UnityEditor.EditorWindow GameView
+        {
+            get
+            {
+                System.Reflection.Assembly assembly = typeof(UnityEditor.EditorWindow).Assembly;
+                System.Type type = assembly.GetType("UnityEditor.GameView");
+                return UnityEditor.EditorWindow.GetWindow(type);
+            }
+        }
+
+        public static Vector2 GetSizeOfMainGameView
+        {
+            get
+            {
+                System.Type typr = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+                System.Reflection.MethodInfo method = typr.GetMethod("GetSizeOfMainGameView", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                object result = method.Invoke(null, null);
+                return (Vector2)result;
+            }
+        }
+
+        public static void RepaintAll()
+        {
+            UnityEditor.SceneView.RepaintAll();
+            UnityEx.GameView.Repaint();
+        }
 #endif  // UNITY_EDITOR
     }
 }
