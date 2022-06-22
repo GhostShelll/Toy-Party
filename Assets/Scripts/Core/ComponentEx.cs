@@ -4,6 +4,9 @@ namespace com.jbg.core
 {
     public class ComponentEx : MonoBehaviour
     {
+        [SerializeField]
+        RectTransform cachedRectTransform;
+
 #if UNITY_EDITOR
         [SerializeField]
         bool setComponent = false;
@@ -40,6 +43,14 @@ namespace com.jbg.core
             }
         }
 
+        public RectTransform CachedRectTransform
+        {
+            get
+            {
+                return this.cachedRectTransform;
+            }
+        }
+
         public virtual void Show()
         {
             this.transform.ShowTransform();
@@ -55,14 +66,6 @@ namespace com.jbg.core
             get
             {
                 return this.transform.IsHideTransform() == false;
-            }
-        }
-
-        public RectTransform GetRectTransform
-        {
-            get
-            {
-                return this.GetComponent<RectTransform>();
             }
         }
 
@@ -94,6 +97,8 @@ namespace com.jbg.core
 
         public void SetComponent()
         {
+            this.cachedRectTransform = this.GetComponent<RectTransform>();
+
             this.OnSetComponent();
 
             UnityEx.SetDirtyAll(this.transform);
