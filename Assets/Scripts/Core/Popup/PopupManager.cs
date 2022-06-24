@@ -21,7 +21,7 @@ namespace com.jbg.core.popup
         [SerializeField]
         LinkedList<Popup> popupList = new();
         public int OpenCount { get { return this.popupList.Count; } }
-        public Popup PopupOn
+        public Popup TopPopup
         {
             get
             {

@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using com.jbg.core.manager;
+using com.jbg.core.popup;
 using com.jbg.content.scene;
 
 namespace com.jbg.core.scene
@@ -37,7 +38,7 @@ namespace com.jbg.core.scene
         public static SceneType CurSceneType { get; private set; }
         public static SceneType BeforeSceneType { get; private set; }
         public static SceneEx SceneInstance { get; private set; }
-        public static bool IsEnableBackButton { get; set; }         // TODO[jbg] : 백버튼 활성화 여부
+        public static bool IsEnableBackButton { get; set; }
 
         private static GameObject curSceneObj = null;
         private static int hideCount = 0;
@@ -81,6 +82,7 @@ namespace com.jbg.core.scene
             Manager.SceneChangeCount = 0;
             Manager.CurSceneType = SceneType.Invalid;
             Manager.BeforeSceneType = SceneType.Invalid;
+            Manager.IsEnableBackButton = true;
 
             if (Manager.SceneInstance != null)
                 Manager.SceneInstance.Close();
@@ -263,12 +265,11 @@ namespace com.jbg.core.scene
             if (enableBackButton == false)
                 return;
 
-            // TODO[jbg] : 팝업의 백 버튼 처리부터 진행
-            //if (Popup.Focused)
-            //{
-            //    Popup.Focused.OnBack();
-            //    return;
-            //}
+            if (PopupManager.Instance.TopPopup != null)
+            {
+                PopupManager.Instance.TopPopup.OnBack();
+                return;
+            }
 
             if (Manager.SceneInstance != null)
                 Manager.SceneInstance.Back();

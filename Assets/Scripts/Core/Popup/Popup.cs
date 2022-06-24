@@ -300,7 +300,7 @@ namespace com.jbg.core.popup
 
         public void Open(Params p, System.Action<Popup> resultCallback, System.Action<Popup> loadedCallback = null)
         {
-            DebugEx.Log("POPUP_OPEN:" + this.name + ", IS OPENED:" + this.IsOpened + ", POPUP_OPEN_COUNT:" + Manager.Instance.OpenCount + ", POPUP_ON:" + Manager.Instance.PopupOn);
+            DebugEx.Log("POPUP_OPEN:" + this.name + ", IS OPENED:" + this.IsOpened + ", POPUP_OPEN_COUNT:" + Manager.Instance.OpenCount + ", POPUP_ON:" + Manager.Instance.TopPopup);
 
             if (this.IsOpened)
                 this.Close();
@@ -324,7 +324,7 @@ namespace com.jbg.core.popup
                 return;
             this.IsOpened = false;
 
-            DebugEx.Log("POPUP_CLOSE:" + this.name + ", POPUP_OPEN_COUNT:" + Manager.Instance.OpenCount + ", POPUP_ON:" + Manager.Instance.PopupOn);
+            DebugEx.Log("POPUP_CLOSE:" + this.name + ", POPUP_OPEN_COUNT:" + Manager.Instance.OpenCount + ", POPUP_ON:" + Manager.Instance.TopPopup);
 
             this.popupBase.Transform.HideTransform();
 
