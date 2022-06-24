@@ -8,10 +8,7 @@ namespace com.jbg.core.popup
     {
         private const string POPUP_BASE_PATH = "Prefabs/Popups/";
 
-        // Singleton
-        private PopupManager() { }
-        private static readonly System.Lazy<PopupManager> instance = new(() => new());
-        public static PopupManager Instance { get { return instance.Value; } }
+        public static PopupManager Instance { get; private set; }
 
         public static string BtnOKSound { get; set; }
         public static string BtnYesSound { get; set; }
@@ -34,6 +31,16 @@ namespace com.jbg.core.popup
         }
 
         private const string basePath = "Prefabs/Popups/";
+
+        private void Awake()
+        {
+            PopupManager.Instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            PopupManager.Instance = null;
+        }
 
         public void AddPopup(Popup popup)
         {

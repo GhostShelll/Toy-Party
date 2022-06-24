@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using com.jbg.core.manager;
 using com.jbg.core.popup;
 using com.jbg.content.scene;
+using com.jbg.content.popup;
 
 namespace com.jbg.core.scene
 {
@@ -305,7 +306,8 @@ namespace com.jbg.core.scene
             {
                 DebugEx.LogWarning("SCENE_MANAGER BAD LOGIC hideCount:" + Manager.hideCount);
 #if UNITY_EDITOR
-                //ViewControl.OpenDebugPopup("BAD LOGIC", "BAD SceneControl.HideCount:" + Manager.hideCount, "", (pop, btn) => { });    TODO[jbg] : 안내 팝업 등장
+                string message = string.Format("BAD LOGIC\n\nBAD SceneControl.HideCount:{0}", Manager.hideCount);
+                SystemPopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, null);
 #endif  // UNITY_EDITOR
             }
 
