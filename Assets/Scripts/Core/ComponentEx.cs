@@ -4,15 +4,15 @@ namespace com.jbg.core
 {
     public class ComponentEx : MonoBehaviour
     {
-        [SerializeField]
-        RectTransform cachedRectTransform;
-
 #if UNITY_EDITOR
         [SerializeField]
         bool setComponent = false;
         [SerializeField]
         bool setComponentChild = false;
 #endif  // UNITY_EDITOR
+
+        [SerializeField]
+        RectTransform cachedRectTransform;
 
         public void Active()
         {
