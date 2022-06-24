@@ -6,7 +6,7 @@ namespace com.jbg.core
 {
     public class DebugEx
     {
-        private static readonly string tag = "TODO[jbg]";
+        private static readonly string tag = "[JBG]";
 
         [Conditional("LOG_DEBUG")]
         public static void Log(object msg)
