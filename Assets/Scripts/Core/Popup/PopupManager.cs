@@ -6,17 +6,38 @@ namespace com.jbg.core.popup
 {
     public class PopupManager : MonoBehaviour
     {
+        private const string POPUP_BASE_PATH = "Prefabs/Popups/";
+
         // Singleton
         private PopupManager() { }
         private static readonly System.Lazy<PopupManager> instance = new(() => new());
         public static PopupManager Instance { get { return instance.Value; } }
 
+        public static string BtnOKSound { get; set; }
+        public static string BtnYesSound { get; set; }
+        public static string BtnNoSound { get; set; }
+        public static string BtnXSound { get; set; }
+
         [SerializeField]
-        List<Popup> popupList = new();
+        LinkedList<Popup> popupList = new();
+        public int OpenCount { get { return this.popupList.Count; } }
+        public Popup PopupOn
+        {
+            get
+            {
+                LinkedListNode<Popup> lastPopup = this.popupList.Last;
+                if (lastPopup == null)
+                    return null;
+
+                return lastPopup.Value;
+            }
+        }
+
+        private const string basePath = "Prefabs/Popups/";
 
         public void AddPopup(Popup popup)
         {
-            this.popupList.Add(popup);
+            this.popupList.AddLast(popup);
         }
 
         public void RemovePopup(Popup popup)
@@ -24,44 +45,115 @@ namespace com.jbg.core.popup
             this.popupList.Remove(popup);
         }
 
-        public bool IsPopupOn()
-        {
-            return (this.popupList.Count > 0);
-        }
-
         public void CloseAllPopup()
         {
-            for (int i = this.popupList.Count - 1; i >= 0; i--)
+            LinkedListNode<Popup> node = this.popupList.First;
+            while (node != null)
             {
-                if (this.popupList[i] != null)
-                    this.popupList[i].Close();
+                Popup popup = node.Value;
+                if (popup != null)
+                    popup.Close();
+
+                node = node.Next;
             }
         }
 
         public void CloseAllPopup_OneExcept<T>() where T : Popup
         {
-            for (int i = this.popupList.Count - 1; i >= 0; i--)
+            LinkedListNode<Popup> node = this.popupList.First;
+            while (node != null)
             {
-                if (this.popupList[i] != null)
+                Popup popup = node.Value;
+                if (popup != null)
                 {
-                    if (this.popupList[i] as T)
+                    if (popup as T)
                         continue;
 
-                    this.popupList[i].Close();
+                    popup.Close();
                 }
+
+                node = node.Next;
             }
         }
 
         public void ShowAllPopup()
         {
-            for (int i = 0; i < this.popupList.Count; i++)
-                this.popupList[i].Show();
+            LinkedListNode<Popup> node = this.popupList.First;
+            while (node != null)
+            {
+                Popup popup = node.Value;
+                if (popup != null)
+                    popup.Show();
+
+                node = node.Next;
+            }
         }
 
         public void HideAllPopup()
         {
-            for (int i = 0; i < this.popupList.Count; i++)
-                this.popupList[i].Hide();
+            LinkedListNode<Popup> node = this.popupList.First;
+            while (node != null)
+            {
+                Popup popup = node.Value;
+                if (popup != null)
+                    popup.Hide();
+
+                node = node.Next;
+            }
+        }
+
+        public Popup Load(string popupName)
+        {
+            DebugEx.Log("POPUP_LOAD:" + popupName);
+
+            if (this == null)
+            {
+                DebugEx.Log("POPUP_LOAD_FAILED:" + popupName + ", MANAGER_IS_NULL");
+                return null;
+            }
+
+            string popupPath = PopupManager.POPUP_BASE_PATH + popupName;
+
+            Popup prefab = Resources.Load<Popup>(popupPath);
+            if (prefab == null)
+            {
+                DebugEx.Log("POPUP_LOAD_FAILED:" + popupName + ", PATH:" + popupPath + ", RESOURCES_LOAD_FAILED");
+                return null;
+            }
+
+            GameObject popupObj = GameObject.Instantiate(prefab.gameObject);
+            if (popupObj == null)
+            {
+                DebugEx.Log("POPUP_LOAD_FAILED:" + popupName + ", PATH:" + popupPath + ", GAMEOBJECT_INSTANTIATE_FAILED");
+
+                Object.Destroy(prefab);
+                return null;
+            }
+
+            Popup popup = popupObj.GetComponent<Popup>();
+            if (popup == null)
+            {
+                DebugEx.Log("POPUP_LOAD_FAILED:" + popupName + ", PATH:" + popupPath + ", GETCOMPONENT_FAILED");
+
+                GameObject.Destroy(popupObj);
+                Object.Destroy(prefab);
+                return null;
+            }
+
+            RectTransform trans = popup.CachedRectTransform;
+            RectTransform transPrefab = prefab.CachedRectTransform;
+            trans.SetParent(this.transform);
+            trans.name = popupName;
+            trans.anchoredPosition = transPrefab.anchoredPosition;
+            trans.localPosition = transPrefab.localPosition;
+            trans.localScale = transPrefab.localScale;
+            trans.offsetMax = transPrefab.offsetMax;
+            trans.offsetMin = transPrefab.offsetMin;
+            trans.HideTransform();
+
+            this.AddPopup(popup);
+
+            return popup;
         }
     }
 }

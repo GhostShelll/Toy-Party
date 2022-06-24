@@ -9,11 +9,7 @@ namespace com.jbg.core
     {
         private Dictionary<int, Action<int, object>> Events { get; set; }
 
-        public virtual void Refresh()
-        {
-            DebugEx.Log(0);
-            Assert.IsTrue(false);
-        }
+        public virtual void Refresh() { }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////// 이벤트 기능

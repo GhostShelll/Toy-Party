@@ -14,12 +14,12 @@ namespace com.jbg.core
         bool setComponentChild = false;
 #endif  // UNITY_EDITOR
 
-        public virtual void Active()
+        public void Active()
         {
             this.gameObject.SetActive(true);
         }
 
-        public virtual void Inactive()
+        public void Inactive()
         {
             this.gameObject.SetActive(false);
         }
@@ -51,12 +51,12 @@ namespace com.jbg.core
             }
         }
 
-        public virtual void Show()
+        public void Show()
         {
             this.transform.ShowTransform();
         }
 
-        public virtual void Hide()
+        public void Hide()
         {
             this.transform.HideTransform();
         }
