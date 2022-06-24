@@ -293,6 +293,41 @@ namespace com.jbg.core.scene
             Manager.appResumeOn = true;
         }
 
+        public static void ShowScene()
+        {
+            DebugEx.Log(string.Format("SCENE_MANAGER SHOW_SCENE (CURRENT:{0}, NEXT:{1})", Manager.hideCount, Manager.hideCount - 1));
+
+            if (Manager.hideCount > 0)
+                Manager.hideCount--;
+
+            if (Manager.hideCount < 0)
+            {
+                DebugEx.LogWarning("SCENE_MANAGER BAD LOGIC hideCount:" + Manager.hideCount);
+#if UNITY_EDITOR
+                //ViewControl.OpenDebugPopup("BAD LOGIC", "BAD SceneControl.HideCount:" + Manager.hideCount, "", (pop, btn) => { });    TODO[jbg] : 안내 팝업 등장
+#endif  // UNITY_EDITOR
+            }
+
+            if (Manager.hideCount == 0)
+            {
+                if (Manager.curSceneObj != null)
+                    Manager.curSceneObj.transform.ShowTransform();
+            }
+        }
+
+        public static void HideScene()
+        {
+            DebugEx.Log(string.Format("SCENE_MANAGER HIDE_SCENE (CURRENT:{0}, NEXT:{1})", Manager.hideCount, Manager.hideCount + 1));
+
+            Manager.hideCount++;
+
+            if (Manager.hideCount == 1)
+            {
+                if (Manager.curSceneObj != null)
+                    Manager.curSceneObj.transform.HideTransform();
+            }
+        }
+
         public class WaitAsyncData
         {
             public Manager.SceneType sceneType;
