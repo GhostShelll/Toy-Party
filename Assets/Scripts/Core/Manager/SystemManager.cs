@@ -4,6 +4,7 @@ using System.Diagnostics;
 using UnityEngine;
 
 using com.jbg.core.scene;
+using com.jbg.content.popup;
 
 namespace com.jbg.core.manager
 {
@@ -62,10 +63,10 @@ namespace com.jbg.core.manager
             }
             catch (System.Exception e)
             {
-                DebugEx.LogError(e);
+                DebugEx.LogWarning(e);
 #if LOG_DEBUG
-                // TODO[jbg] : 에러 팝업 연출
-                //ViewControl.OpenDebugPopup(e.GetType().Name, e.Message, e.StackTrace, (pop, btn) => { SystemControl.Reset(); });
+                string message = string.Format("{0}\n\n{1}\n\n{2}", e.GetType().Name, e.Message, e.StackTrace);
+                SystemPopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, null);
 #endif  // LOG_DEBUG
             }
 

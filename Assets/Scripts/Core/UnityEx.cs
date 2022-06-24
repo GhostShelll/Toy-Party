@@ -39,6 +39,138 @@ namespace com.jbg.core
             return pos.y >= 1000000;
         }
 
+        public static Transform FindTransform(this GameObject go, string path)
+        {
+            if (go != null)
+                return go.transform.Find(path);
+
+            return null;
+        }
+
+        public static GameObject FindObject(this GameObject go, string path)
+        {
+            Transform t = UnityEx.FindTransform(go, path);
+            return t != null ? t.gameObject : null;
+        }
+
+        public static Transform FindTransform(this Transform t, string path)
+        {
+            if (t != null)
+                return t.Find(path);
+
+            return null;
+        }
+
+        public static GameObject FindObject(this Transform t, string path)
+        {
+            t = UnityEx.FindTransform(t, path);
+            return t != null ? t.gameObject : null;
+        }
+
+        public static Transform FindTransform(this Component c, string path)
+        {
+            if (c != null)
+                return c.transform.Find(path);
+
+            return null;
+        }
+
+        public static GameObject FindObject(this Component c, string path)
+        {
+            Transform t = UnityEx.FindTransform(c, path);
+            return t != null ? t.gameObject : null;
+        }
+
+        public static Transform FindTransform(this ComponentEx c, string path)
+        {
+            if (c != null)
+                return c.CachedTransform.Find(path);
+
+            return null;
+        }
+
+        public static GameObject FindObject(this ComponentEx c, string path)
+        {
+            Transform t = UnityEx.FindTransform(c, path);
+            return t != null ? t.gameObject : null;
+        }
+
+        public static T FindComponent<T>(this GameObject go, string path = null) where T : Component
+        {
+            if (go != null)
+            {
+                if (string.IsNullOrEmpty(path) == false)
+                {
+                    Transform t = UnityEx.FindTransform(go, path);
+                    if (t != null)
+                        return t.GetComponent<T>();
+                }
+                else
+                {
+                    return go.GetComponent<T>();
+                }
+            }
+
+            return null;
+        }
+
+        public static T FindComponent<T>(this Component c, string path = null) where T : Component
+        {
+            if (c != null)
+            {
+                if (string.IsNullOrEmpty(path) == false)
+                {
+                    Transform t = UnityEx.FindTransform(c, path);
+                    if (t != null)
+                        return t.GetComponent<T>();
+                }
+                else
+                {
+                    return c.GetComponent<T>();
+                }
+            }
+
+            return null;
+        }
+
+        public static T FindComponentInChildren<T>(this GameObject go, string path = null) where T : Component
+        {
+            if (go != null)
+            {
+                if (string.IsNullOrEmpty(path) == false)
+                {
+                    Transform t = UnityEx.FindTransform(go, path);
+                    if (t != null)
+                        return t.GetComponentInChildren<T>();
+                }
+                else
+                {
+                    return go.GetComponentInChildren<T>();
+                }
+            }
+
+            return null;
+        }
+
+        public static T FindComponentInChildren<T>(this Component c, string path = null) where T : Component
+        {
+            if (c != null)
+            {
+                if (string.IsNullOrEmpty(path) == false)
+                {
+                    Transform t = UnityEx.FindTransform(c, path);
+                    if (t != null)
+                        return t.GetComponentInChildren<T>();
+                }
+                else
+                {
+                    return c.GetComponentInChildren<T>();
+                }
+            }
+
+            return null;
+        }
+
 #if UNITY_EDITOR
         public static void SetDirtyAll(Transform trans)
         {

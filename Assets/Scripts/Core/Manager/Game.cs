@@ -10,14 +10,13 @@ namespace com.jbg.core.manager
 {
     public class Game : MonoBehaviour
     {
-        // Singleton
-        private Game() { }
-        private static readonly System.Lazy<Game> instance = new(() => new());
-        public static Game Instance { get { return instance.Value; } }
+        public static Game Instance { get; private set; }
 
         private void Awake()
         {
             DebugEx.Log("GAME::AWAKE");
+
+            Game.Instance = this;
 
 #if LOG_DEBUG
             System.Text.StringBuilder pathLog = new();
@@ -45,6 +44,8 @@ namespace com.jbg.core.manager
         private void OnDestroy()
         {
             SystemManager.Close();
+
+            Game.Instance = null;
         }
 
         private void Update()

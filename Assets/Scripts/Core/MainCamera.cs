@@ -21,10 +21,7 @@ namespace com.jbg.core
         bool editorReset = false;
 #endif  // UNITY_EDITOR
 
-        // Singleton
-        private MainCamera() { }
-        private static readonly System.Lazy<MainCamera> instance = new(() => new());
-        public static MainCamera Instance { get { return instance.Value; } }
+        public static MainCamera Instance { get; private set; }
 
         public static Camera Camera
         {
@@ -36,6 +33,8 @@ namespace com.jbg.core
 
         private void Awake()
         {
+            MainCamera.Instance = this;
+
             this.DoResize(this.manualWidth, this.manualHeight);
         }
 
@@ -43,6 +42,11 @@ namespace com.jbg.core
         {
             if (this.autoResize)
                 this.DoResize(this.manualWidth, this.manualHeight);
+        }
+
+        private void OnDestroy()
+        {
+            MainCamera.Instance = null;
         }
 
         private void DoResize(int newWidth, int newHeight)

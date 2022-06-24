@@ -11,12 +11,15 @@ namespace com.jbg.core
         bool setComponentChild = false;
 #endif  // UNITY_EDITOR
 
-        public virtual void Active()
+        [SerializeField]
+        RectTransform cachedRectTransform;
+
+        public void Active()
         {
             this.gameObject.SetActive(true);
         }
 
-        public virtual void Inactive()
+        public void Inactive()
         {
             this.gameObject.SetActive(false);
         }
@@ -40,12 +43,20 @@ namespace com.jbg.core
             }
         }
 
-        public virtual void Show()
+        public RectTransform CachedRectTransform
+        {
+            get
+            {
+                return this.cachedRectTransform;
+            }
+        }
+
+        public void Show()
         {
             this.transform.ShowTransform();
         }
 
-        public virtual void Hide()
+        public void Hide()
         {
             this.transform.HideTransform();
         }
@@ -55,14 +66,6 @@ namespace com.jbg.core
             get
             {
                 return this.transform.IsHideTransform() == false;
-            }
-        }
-
-        public RectTransform GetRectTransform
-        {
-            get
-            {
-                return this.GetComponent<RectTransform>();
             }
         }
 
@@ -94,6 +97,8 @@ namespace com.jbg.core
 
         public void SetComponent()
         {
+            this.cachedRectTransform = this.GetComponent<RectTransform>();
+
             this.OnSetComponent();
 
             UnityEx.SetDirtyAll(this.transform);
