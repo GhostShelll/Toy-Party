@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using com.jbg.asset.control;
+using com.jbg.asset.data;
 using com.jbg.core.popup;
 
 namespace com.jbg.content.popup
@@ -36,7 +38,7 @@ namespace com.jbg.content.popup
             Popup.Params p = new();
             p.title = title;
             p.message = message;
-            p.btnOkText = "EXIT";           // TODO[jbg] : Locale 에셋 구현
+            p.btnOkText = LocaleControl.GetString(LocaleCodes.BTN_OK);
 
             return Assist.OpenPopup("Popup_Notice_1Btn", p, resultCallback);
         }
