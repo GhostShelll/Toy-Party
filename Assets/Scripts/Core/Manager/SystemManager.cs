@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 using UnityEngine;
 
+using com.jbg.asset;
 using com.jbg.core.scene;
 using com.jbg.content.popup;
 
@@ -29,6 +30,7 @@ namespace com.jbg.core.manager
             Manager.AddOpenList(CLASSNAME);
 
             // 각종 매니저 오픈 함수 실행
+            AssetManager.Open();
             SceneExManager.Open();
         }
 
@@ -43,6 +45,7 @@ namespace com.jbg.core.manager
                 Manager.RemoveOpenList(CLASSNAME);
 
                 // 각종 매니저 클로즈 함수 실행
+                AssetManager.Close();
                 SceneExManager.Close();
             }
 
