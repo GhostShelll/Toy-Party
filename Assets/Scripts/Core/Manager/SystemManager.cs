@@ -66,7 +66,7 @@ namespace com.jbg.core.manager
             }
             catch (System.Exception e)
             {
-                DebugEx.LogWarning(e);
+                UnityEngine.Debug.LogWarning(e);
 #if LOG_DEBUG
                 string message = string.Format("{0}\n\n{1}\n\n{2}", e.GetType().Name, e.Message, e.StackTrace);
                 SystemPopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, null);
