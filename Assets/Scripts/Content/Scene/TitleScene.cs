@@ -11,7 +11,10 @@ namespace com.jbg.content.scene
         {
             base.OnOpen();
 
-            SystemPopupAssist.OpenNoticeOneBtnPopup("JBG TITLE", "JBG MESSAGE\nJBG MESSAGE\nJBG MESSAGE\n", null);
+            SystemPopupAssist.OpenNoticeOneBtnPopup("JBG TITLE", "JBG MESSAGE\nJBG MESSAGE\nJBG MESSAGE\n", (popup) =>
+            {
+                SystemPopupAssist.OpenNoticeOneBtnPopup("JBG TITLE22222", "JBG MESSAGE\nJBG MESSAGE\nJBG MESSAGE\n", null);
+            });
         }
 
         protected override void OnClose()
