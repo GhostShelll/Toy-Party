@@ -5,6 +5,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 using com.jbg.asset.control;
 using com.jbg.core;
@@ -78,6 +79,11 @@ namespace com.jbg.asset
                 Storage<K, V>.Open(null, getKey, Manager.DISPOSE_TAG);
                 return false;
             }
+        }
+
+        public static void CloseStorage<K, V>() where V : class
+        {
+            Storage<K, V>.Close();
         }
 
         public static void OpenStorageManually<K, V>(string jsonText, JArray jarr, V[] array, Storage<K, V>.GetKeyCallback getKey, string filePath = null) where V : class

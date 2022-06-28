@@ -93,6 +93,8 @@ namespace com.jbg.asset.control
                 Control.IsOpened = false;
 
                 SystemManager.RemoveOpenList(CLASSNAME);
+
+                AssetManager.CloseStorage<int, LocaleData>();
             }
         }
 
