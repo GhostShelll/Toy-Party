@@ -10,11 +10,6 @@ namespace com.jbg.core.popup
 
         public static PopupManager Instance { get; private set; }
 
-        public static string BtnOKSound { get; set; }
-        public static string BtnYesSound { get; set; }
-        public static string BtnNoSound { get; set; }
-        public static string BtnXSound { get; set; }
-
         [SerializeField]
         LinkedList<Popup> popupList = new();
         public int OpenCount { get { return this.popupList.Count; } }
@@ -29,8 +24,6 @@ namespace com.jbg.core.popup
                 return lastPopup.Value;
             }
         }
-
-        private const string basePath = "Prefabs/Popups/";
 
         private void Awake()
         {
