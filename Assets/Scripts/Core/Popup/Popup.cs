@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using com.jbg.asset;
 using com.jbg.core.scene;
+using com.jbg.core.manager;
 
 namespace com.jbg.core.popup
 {
@@ -365,30 +367,21 @@ namespace com.jbg.core.popup
             this.IsOK = (go != null) && (go == this.btnOK.GameObject);
             this.IsX = (go != null) && (go == this.btnX.GameObject);
 
-            // TODO[jbg] : 효과음 기능 구현
-            //if (this.IsOK)
-            //{
-            //    if (this.BtnCancelVisible)
-            //    {
-            //        if (string.IsNullOrEmpty(Manager.BtnYesSound) == false)
-            //            SoundFx.Play(Manager.BtnYesSound);
-            //    }
-            //    else
-            //    {
-            //        if (string.IsNullOrEmpty(Manager.BtnOKSound) == false)
-            //            SoundFx.Play(Manager.BtnOKSound);
-            //    }
-            //}
-            //else if (go == this.btnCancel.GameObject)
-            //{
-            //    if (string.IsNullOrEmpty(Manager.BtnNoSound) == false)
-            //        SoundFx.Play(Manager.BtnNoSound);
-            //}
-            //else if (this.IsX)
-            //{
-            //    if (string.IsNullOrEmpty(Manager.BtnXSound) == false)
-            //        SoundFx.Play(Manager.BtnXSound);
-            //}
+            if (this.IsOK)
+            {
+                if (this.BtnCancelVisible)
+                    SoundManager.Inst.Play(SoundManager.SOUND_YES);
+                else
+                    SoundManager.Inst.Play(SoundManager.SOUND_YES);
+            }
+            else if (go == this.btnCancel.GameObject)
+            {
+                SoundManager.Inst.Play(SoundManager.SOUND_NO);
+            }
+            else if (this.IsX)
+            {
+                SoundManager.Inst.Play(SoundManager.SOUND_NO);
+            }
 
             if (this.OnClickOverride(go))
                 this.Close();
