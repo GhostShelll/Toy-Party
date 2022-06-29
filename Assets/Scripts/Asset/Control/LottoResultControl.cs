@@ -19,9 +19,6 @@ namespace com.jbg.asset.control
         public static bool IsOpened { get; private set; }
 
         private static readonly Dictionary<int, LottoResultData> builtInData = new();
-#if CHECK_LOTTO_NUMBERS
-        private static readonly Dictionary<int, LottoResultData> originData = new();
-#endif
 
         private const string CLASSNAME = "LottoResultControl";
 
@@ -82,13 +79,13 @@ namespace com.jbg.asset.control
             }, true, 1);
 
             List<LottoResultData> originDataList = JsonConvert.DeserializeObject<List<LottoResultData>>(originDataJSON);
+            Dictionary<int, LottoResultData> originDataDic = new();
 
-            Control.originData.Clear();
             for (int i = 0; i < originDataList.Count; i++)
             {
-                if (Control.originData.ContainsKey(originDataList[i].code) == false)
+                if (originDataDic.ContainsKey(originDataList[i].code) == false)
                 {
-                    Control.originData.Add(originDataList[i].code, new LottoResultData()
+                    originDataDic.Add(originDataList[i].code, new LottoResultData()
                     {
                         code = originDataList[i].code,
                         num1 = originDataList[i].num1,
@@ -102,7 +99,7 @@ namespace com.jbg.asset.control
                 }
             }
 
-            Dictionary<int, LottoResultData>.Enumerator enumerator = Control.originData.GetEnumerator();
+            Dictionary<int, LottoResultData>.Enumerator enumerator = originDataDic.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 int code = enumerator.Current.Key;
