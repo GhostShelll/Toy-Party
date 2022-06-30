@@ -38,7 +38,7 @@ namespace com.jbg.core.manager
         {
             SystemManager.Open();
 
-            SceneExManager.OpenScene(SceneExManager.SceneType.Title);   // 첫번째 씬은 타이틀 부터
+            SceneExManager.OpenScene(SceneExManager.SceneType.Main);   // 첫번째 씬은 타이틀 부터
         }
 
         private void OnDestroy()

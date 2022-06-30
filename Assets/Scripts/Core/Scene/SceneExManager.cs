@@ -19,19 +19,19 @@ namespace com.jbg.core.scene
         public enum SceneType
         {
             Invalid,
-            Title,
+            Main,
         }
 
         private static readonly string[] SceneName = new string[]
         {
             "Game",
-            "TitleScene",
+            "MainScene",
         };
 
         private delegate SceneEx FactoryFunc();
         private static readonly Dictionary<SceneType, FactoryFunc> SingleFactory = new()
         {
-            { SceneType.Title, () => { return new TitleScene(); } },
+            { SceneType.Main, () => { return new MainScene(); } },
         };
 
         public static bool IsOpened { get; private set; }
