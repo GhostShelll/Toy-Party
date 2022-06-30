@@ -31,6 +31,7 @@ namespace com.jbg.asset
 
             // 각종 에셋 오픈
             LocaleControl.Open();
+            LottoResultControl.Open();
 
 #if LOG_DEBUG && UNITY_EDITOR
             // 에셋 에러에 대한 로그
@@ -58,6 +59,7 @@ namespace com.jbg.asset
 
                 // 각종 에셋 클로즈
                 LocaleControl.Close();
+                LottoResultControl.Close();
             }
         }
 
