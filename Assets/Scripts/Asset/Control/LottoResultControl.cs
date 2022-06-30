@@ -1,6 +1,7 @@
 //#define CHECK_LOTTO_NUMBERS
 
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using Newtonsoft.Json;
@@ -12,15 +13,16 @@ using com.jbg.core.manager;
 namespace com.jbg.asset.control
 {
     using Control = LottoResultControl;
-    using DataStorage = Storage<int, LottoResultData>;
 
     public class LottoResultControl
     {
         public static bool IsOpened { get; private set; }
 
         private static readonly Dictionary<int, LottoResultData> builtInData = new();
+        private static readonly Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
 
         private const string CLASSNAME = "LottoResultControl";
+        private const int MAX_NUMBER = 45;
 
         public static void Open()
         {
@@ -99,17 +101,17 @@ namespace com.jbg.asset.control
                 }
             }
 
-            Dictionary<int, LottoResultData>.Enumerator enumerator = originDataDic.GetEnumerator();
-            while (enumerator.MoveNext())
+            Dictionary<int, LottoResultData>.Enumerator enumerator1 = originDataDic.GetEnumerator();
+            while (enumerator1.MoveNext())
             {
-                int code = enumerator.Current.Key;
+                int code = enumerator1.Current.Key;
                 if (Control.builtInData.ContainsKey(code) == false)
                 {
                     DebugEx.LogColor(string.Format("[LOTTO CHECK] Code : {0}에 대한 빌트인 정보가 없습니다.", code), "red");
                     return;
                 }
 
-                LottoResultData originData = enumerator.Current.Value;
+                LottoResultData originData = enumerator1.Current.Value;
                 LottoResultData checkData = Control.builtInData[code];
 
                 int[] numArr = new int[] { originData.num1, originData.num2, originData.num3, originData.num4, originData.num5, originData.num6 };
@@ -131,7 +133,51 @@ namespace com.jbg.asset.control
                 }
             }
 #endif  // CHECK_LOTTO_NUMBERS
+
+            // 추첨 순서 별 번호 나온 횟수를 0으로 초기화
+            Control.lottoNumberMap.Clear();
+            Control.lottoNumberMap.Add(1, Enumerable.Repeat(0, 45).ToList());
+            Control.lottoNumberMap.Add(2, Enumerable.Repeat(0, 45).ToList());
+            Control.lottoNumberMap.Add(3, Enumerable.Repeat(0, 45).ToList());
+            Control.lottoNumberMap.Add(4, Enumerable.Repeat(0, 45).ToList());
+            Control.lottoNumberMap.Add(5, Enumerable.Repeat(0, 45).ToList());
+            Control.lottoNumberMap.Add(6, Enumerable.Repeat(0, 45).ToList());
+            Control.lottoNumberMap.Add(7, Enumerable.Repeat(0, 45).ToList());
+
+            Dictionary<int, LottoResultData>.Enumerator enumerator2 = Control.builtInData.GetEnumerator();
+            while (enumerator2.MoveNext())
+            {
+                int code = enumerator2.Current.Key;
+                LottoResultData data = enumerator2.Current.Value;
+
+                Control.lottoNumberMap[1][data.num1 - 1]++;
+                Control.lottoNumberMap[2][data.num2 - 1]++;
+                Control.lottoNumberMap[3][data.num3 - 1]++;
+                Control.lottoNumberMap[4][data.num4 - 1]++;
+                Control.lottoNumberMap[5][data.num5 - 1]++;
+                Control.lottoNumberMap[6][data.num6 - 1]++;
+                Control.lottoNumberMap[7][data.bonus - 1]++;
+            }
+
+            // TODO[jbg] : 아래 내용 지워야함
+            System.Text.StringBuilder log = new();
+            log.AppendLine();
+            log.Append('\t').Append('1').Append('\t').Append('2').Append('\t').Append('3').Append('\t').Append('4').Append('\t').Append('5').Append('\t').Append('6').Append('\t').Append("Bonus");
+            log.AppendLine();
+
+            for (int i = 0; i < Control.MAX_NUMBER; i++)
+            {
+                log.Append(i + 1);
+                log.Append('\t').Append(Control.lottoNumberMap[1][i]).Append('\t').Append(Control.lottoNumberMap[2][i]).Append('\t').Append(Control.lottoNumberMap[3][i]);
+                log.Append('\t').Append(Control.lottoNumberMap[4][i]).Append('\t').Append(Control.lottoNumberMap[5][i]).Append('\t').Append(Control.lottoNumberMap[6][i]);
+                log.Append('\t').Append(Control.lottoNumberMap[7][i]);
+                log.AppendLine();
+            }
+
+            DebugEx.LogColor(log.ToString(), "red");
         }
+
+        public static int RecentPeriod { get { return Control.builtInData.Count; } }        // 가장 최근 진행한 회차
 
         public static void Close()
         {
