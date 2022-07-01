@@ -509,10 +509,17 @@ namespace com.jbg.core.popup
 
             t = cached.Find("Message");
             this.messageBase = new BaseComponent(t);
-            Text[] text = t.GetComponentsInChildren<Text>();
-            if (text != null)
-                System.Array.Sort<Text>(text, (l, r) => { return l.name.CompareTo(r.name); });
-            this.messageText = text;
+            if (t != null)
+            {
+                Text[] text = t.GetComponentsInChildren<Text>();
+                if (text != null)
+                    System.Array.Sort<Text>(text, (l, r) => { return l.name.CompareTo(r.name); });
+                this.messageText = text;
+            }
+            else
+            {
+                this.messageText = null; 
+            }
 
             this.btnOK = new ButtonComponent(cached.Find("BtnOk"));
             this.btnCancel = new ButtonComponent(cached.Find("BtnCancel"));
