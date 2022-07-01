@@ -1,3 +1,5 @@
+using com.jbg.asset.control;
+using com.jbg.asset.data;
 using com.jbg.content.popup.view;
 using com.jbg.core;
 using com.jbg.core.manager;
@@ -35,9 +37,9 @@ namespace com.jbg.content.popup
             this.resultCallback = resultCallback;
 
             LottoPopup.Params p = new();
-            p.lottoInfoTxt = "@@회차별 로또 번호를 선택해주세요.";        // TODO[jbg] : 로케일 데이터 사용
-            p.defaultSelectTxt = "@@Select";
-            p.btnShuffleTxt = "@@Shuffle";
+            p.lottoInfoTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_MSG);
+            p.defaultSelectTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_DEFAULT_SELECT);
+            p.btnShuffleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_SHUFFLE_BTN_TEXT);
 
             SystemPopupAssist.OpenPopup("Popup_Lotto", p, this.ResultCallback, this.LoadedCallback);
         }
