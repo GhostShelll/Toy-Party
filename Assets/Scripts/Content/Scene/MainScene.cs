@@ -11,40 +11,10 @@ namespace com.jbg.content.scene
         {
             base.OnOpen();
 
-            SystemPopupAssist.OpenNoticeOneBtnPopup("JBG TITLE", "JBG MESSAGE\nJBG MESSAGE\nJBG MESSAGE\n", (popup) =>
+            LottoPopupAssist.Open(() =>
             {
-                SystemPopupAssist.OpenNoticeOneBtnPopup("JBG TITLE22222", "JBG MESSAGE\nJBG MESSAGE\nJBG MESSAGE\n", null);
+
             });
-        }
-
-        protected override void OnClose()
-        {
-            base.OnClose();
-        }
-
-        protected override void OnUpdate()
-        {
-            base.OnUpdate();
-        }
-
-        protected override void OnBack()
-        {
-            base.OnBack();
-        }
-
-        protected override void OnAppSuspend()
-        {
-            base.OnAppSuspend();
-        }
-
-        protected override void OnAppResume()
-        {
-            base.OnAppResume();
-        }
-
-        protected override void Refresh()
-        {
-            base.Refresh();
         }
     }
 }
