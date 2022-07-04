@@ -87,6 +87,7 @@ namespace com.jbg.content.popup
                 return;
             }
 
+            this.popupView.Hide();
             LottoSelectPopupAssist.Open(btnNum, (selectedIndex) =>
             {
                 if (this.selectedNumbers.ContainsKey(btnNum) == false)
@@ -106,6 +107,7 @@ namespace com.jbg.content.popup
                 }
 
                 this.popupView.SetSelectInfoText(btnNum - 1, selectInfo.ToString());
+                this.popupView.Show();
             });
         }
 
