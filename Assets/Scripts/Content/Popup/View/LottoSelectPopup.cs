@@ -71,9 +71,9 @@ namespace com.jbg.content.popup.view
             this.currentNumTxt.text = value;
         }
 
-        public void OnClickHighestNumOn(bool value)
+        public void OnClickHighestNumOn()
         {
-            this.DoEvent(Event.HighestNumOn, value);
+            this.DoEvent(Event.HighestNumOn, this.highestToggle.isOn);
         }
 
         public void OnClickNumMinus()

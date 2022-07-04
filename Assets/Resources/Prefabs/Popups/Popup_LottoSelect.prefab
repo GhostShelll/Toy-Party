@@ -6924,7 +6924,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1904105433990893118}
         m_TargetAssemblyTypeName: com.jbg.content.popup.view.LottoSelectPopup, Assembly-CSharp
         m_MethodName: OnClickHighestNumOn
-        m_Mode: 6
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
