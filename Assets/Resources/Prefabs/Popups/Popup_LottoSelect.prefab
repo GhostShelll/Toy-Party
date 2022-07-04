@@ -256,9 +256,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: com.jbg.content.popup.view.LottoPopup, Assembly-CSharp
-        m_MethodName: OnClickShuffle
+      - m_Target: {fileID: 1904105433990893118}
+        m_TargetAssemblyTypeName: com.jbg.content.popup.view.LottoSelectPopup, Assembly-CSharp
+        m_MethodName: OnClickNumMinus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -277,6 +277,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 22417524}
+  - component: {fileID: 1904105433990893118}
   m_Layer: 5
   m_Name: Popup_LottoSelect
   m_TagString: Untagged
@@ -307,6 +308,120 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1904105433990893118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6aa4d1ce1bb1eb48bbbeb558a19c4dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  setComponent: 0
+  setComponentChild: 0
+  cachedRectTransform: {fileID: 22417524}
+  popupBase:
+    gameObject: {fileID: 164384}
+    transform: {fileID: 22417524}
+    rectTransform: {fileID: 22417524}
+  touchLocked:
+    gameObject: {fileID: 178084}
+    transform: {fileID: 22429152}
+    rectTransform: {fileID: 22429152}
+  blindBase:
+    gameObject: {fileID: 150334}
+    transform: {fileID: 22432008}
+    rectTransform: {fileID: 22432008}
+  contentsBase:
+    gameObject: {fileID: 194128}
+    transform: {fileID: 22475558}
+    rectTransform: {fileID: 22475558}
+  titleBase:
+    gameObject: {fileID: 170966}
+    transform: {fileID: 22443800}
+    rectTransform: {fileID: 22443800}
+  titleText: {fileID: 11478634}
+  messageBase:
+    gameObject: {fileID: 0}
+    transform: {fileID: 0}
+    rectTransform: {fileID: 0}
+  messageText: []
+  btnOK:
+    gameObject: {fileID: 0}
+    transform: {fileID: 0}
+    rectTransform: {fileID: 0}
+    button: {fileID: 0}
+    box: {fileID: 0}
+    disabled: {fileID: 0}
+    label: {fileID: 0}
+  btnCancel:
+    gameObject: {fileID: 0}
+    transform: {fileID: 0}
+    rectTransform: {fileID: 0}
+    button: {fileID: 0}
+    box: {fileID: 0}
+    disabled: {fileID: 0}
+    label: {fileID: 0}
+  btnX:
+    gameObject: {fileID: 2674206246253282615}
+    transform: {fileID: 3633763959300231219}
+    rectTransform: {fileID: 3633763959300231219}
+    button: {fileID: 5182067934489425379}
+    box: {fileID: 0}
+    disabled: {fileID: 0}
+    label: {fileID: 3019230726228027635}
+  countTxt:
+  - {fileID: 872981790553640266}
+  - {fileID: 2975130181056573994}
+  - {fileID: 643406899144059178}
+  - {fileID: 3293203260751194946}
+  - {fileID: 7938448996734127550}
+  - {fileID: 2270688962455944290}
+  - {fileID: 8016826545633852715}
+  - {fileID: 7117881445769463727}
+  - {fileID: 728922757799864707}
+  - {fileID: 1650041751035032219}
+  - {fileID: 3573285428945291119}
+  - {fileID: 78440875866522940}
+  - {fileID: 4199128178504423055}
+  - {fileID: 226218217702004909}
+  - {fileID: 2560022501003387045}
+  - {fileID: 5891091117081669002}
+  - {fileID: 4423070740130206724}
+  - {fileID: 3647829363821629600}
+  - {fileID: 6132437729030681574}
+  - {fileID: 1135071479529138596}
+  - {fileID: 5469722196011856170}
+  - {fileID: 6827048778839728744}
+  - {fileID: 8128995736750953783}
+  - {fileID: 7114983858183529708}
+  - {fileID: 1758940950325227195}
+  - {fileID: 2377663466543268051}
+  - {fileID: 3962332879069481847}
+  - {fileID: 3921642043890119189}
+  - {fileID: 8492172533586961261}
+  - {fileID: 8756786060489878098}
+  - {fileID: 1846925316533585787}
+  - {fileID: 5161181108733010789}
+  - {fileID: 5374638114403271153}
+  - {fileID: 6576423732223637492}
+  - {fileID: 1876659889667357493}
+  - {fileID: 391310417584345607}
+  - {fileID: 1634327412327588020}
+  - {fileID: 7938622414557100866}
+  - {fileID: 2330351807690903909}
+  - {fileID: 8639009140074282224}
+  - {fileID: 1366954372524565609}
+  - {fileID: 1039715023211987246}
+  - {fileID: 3759578019233315103}
+  - {fileID: 5996718502870991300}
+  - {fileID: 2723694240649476954}
+  highestToggle: {fileID: 4524377569977892249}
+  highestToggleTxt: {fileID: 639392741711520058}
+  currentNumTxt: {fileID: 2092713483716963092}
 --- !u!1 &170966
 GameObject:
   m_ObjectHideFlags: 0
@@ -6805,7 +6920,19 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1904105433990893118}
+        m_TargetAssemblyTypeName: com.jbg.content.popup.view.LottoSelectPopup, Assembly-CSharp
+        m_MethodName: OnClickHighestNumOn
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 0
 --- !u!1 &1798721933786393711
 GameObject:
@@ -9410,7 +9537,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1904105433990893118}
         m_TargetAssemblyTypeName: com.jbg.core.popup.Popup, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 2
@@ -25017,9 +25144,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: com.jbg.content.popup.view.LottoPopup, Assembly-CSharp
-        m_MethodName: OnClickShuffle
+      - m_Target: {fileID: 1904105433990893118}
+        m_TargetAssemblyTypeName: com.jbg.content.popup.view.LottoSelectPopup, Assembly-CSharp
+        m_MethodName: OnClickNumPlus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
