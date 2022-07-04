@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Text;
+
 using com.jbg.asset.control;
 using com.jbg.asset.data;
 using com.jbg.content.popup.view;
@@ -15,6 +18,8 @@ namespace com.jbg.content.popup
 
         private LottoPopup popupView;
         private System.Action resultCallback;
+
+        private Dictionary<int, List<int>> selectedNumbers;     // 각 슬롯 별로 선택된 번호들
 
         #region Static members
         public static void Open(System.Action resultCallback)
@@ -36,6 +41,10 @@ namespace com.jbg.content.popup
         {
             this.resultCallback = resultCallback;
 
+            if (this.selectedNumbers != null)
+                this.selectedNumbers.Clear();
+            this.selectedNumbers = new();
+
             LottoPopup.Params p = new();
             p.lottoInfoTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_MSG);
             p.defaultSelectTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_DEFAULT_SELECT);
@@ -51,6 +60,9 @@ namespace com.jbg.content.popup
 
             this.resultCallback?.Invoke();
             this.resultCallback = null;
+
+            this.selectedNumbers.Clear();
+            this.selectedNumbers = null;
 
             Assist.Close();
         }
@@ -74,7 +86,26 @@ namespace com.jbg.content.popup
                 return;
             }
 
-            DebugEx.Log("TODO[jbg] OnClickSelect Number:" + btnNum);
+            LottoSelectPopupAssist.Open(btnNum, (selectedIndex) =>
+            {
+                if (this.selectedNumbers.ContainsKey(btnNum) == false)
+                    this.selectedNumbers.Add(btnNum, new());
+                else
+                    this.selectedNumbers[btnNum].Clear();
+
+                StringBuilder selectInfo = new();
+                for (int i = 0; i < selectedIndex.Length; i++)
+                {
+                    int num = selectedIndex[i] + 1;
+                    selectInfo.Append(num);
+                    if (i + 1 < selectedIndex.Length)
+                        selectInfo.Append(", ");
+
+                    this.selectedNumbers[btnNum].Add(num);
+                }
+
+                this.popupView.SetSelectInfoText(btnNum - 1, selectInfo.ToString());
+            });
         }
 
         private void OnClickShuffle(int eventNum, object obj)
