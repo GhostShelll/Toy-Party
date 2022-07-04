@@ -38,7 +38,7 @@ namespace com.jbg.content.popup
 
             LottoSelectPopup.Params p = new();
             p.countTxt = new();
-            p.highestToggleTxt = "@@높은 순으로 선택";
+            p.highestToggleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_SELECT_POPUP_TOGGLE_TEXT);
 
             SystemPopupAssist.OpenPopup("Popup_LottoSelect", p, this.ResultCallback, this.LoadedCallback);
         }

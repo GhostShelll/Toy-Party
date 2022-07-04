@@ -3,3 +3,4 @@ code,koKR,enUS
 1100,번호의 추첨 순서별로 나왔던 번호의 노출 확률을 확인해주세요.\n모든 번호를 정해주시고 '번호 생성' 버튼을 누르면 로또 번호를 생성합니다.,"Please check the exposure probability of the numbers that came out in the lottery order of the numbers.\nAfter selecting all numbers, click the 'Number Shuffle' button to generate a lottery number."
 1101,번호 선택,Select Numbers
 1102,번호 생성,Number Shuffle
+1103,높은 순으로 선택하기,Select in Ascending Order

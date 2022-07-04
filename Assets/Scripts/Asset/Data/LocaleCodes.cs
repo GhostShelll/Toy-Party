@@ -18,5 +18,10 @@ namespace com.jbg.asset.data
         /// 로또 팝업의 번호 생성 버튼 문구
         /// </summary>
         public const int LOTTO_POPUP_SHUFFLE_BTN_TEXT = 1102;
+
+        /// <summary>
+        /// 로또 번호 선택 팝업의 토글 문구
+        /// </summary>
+        public const int LOTTO_SELECT_POPUP_TOGGLE_TEXT = 1103;
     }
 }
