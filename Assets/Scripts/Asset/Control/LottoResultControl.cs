@@ -18,11 +18,10 @@ namespace com.jbg.asset.control
     {
         public static bool IsOpened { get; private set; }
 
-        private static readonly Dictionary<int, LottoResultData> builtInData = new();
-        private static readonly Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
+        private static Dictionary<int, LottoResultData> builtInData = new();
+        private static Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
 
         private const string CLASSNAME = "LottoResultControl";
-        private const int MAX_NUMBER = 45;
 
         public static void Open()
         {
@@ -48,7 +47,7 @@ namespace com.jbg.asset.control
             // 빌트인 정보 저장
             List<LottoResultData> builtInDataList = JsonConvert.DeserializeObject<List<LottoResultData>>(csvToJSON);
 
-            Control.builtInData.Clear();
+            Control.builtInData = new();
             for (int i = 0; i < builtInDataList.Count; i++)
             {
                 if (Control.builtInData.ContainsKey(builtInDataList[i].code) == false)
@@ -135,7 +134,7 @@ namespace com.jbg.asset.control
 #endif  // CHECK_LOTTO_NUMBERS
 
             // 추첨 순서 별 번호 나온 횟수를 0으로 초기화
-            Control.lottoNumberMap.Clear();
+            Control.lottoNumberMap = new();
             Control.lottoNumberMap.Add(1, Enumerable.Repeat(0, 45).ToList());
             Control.lottoNumberMap.Add(2, Enumerable.Repeat(0, 45).ToList());
             Control.lottoNumberMap.Add(3, Enumerable.Repeat(0, 45).ToList());
@@ -167,6 +166,14 @@ namespace com.jbg.asset.control
             if (Control.IsOpened)
             {
                 Control.IsOpened = false;
+
+                if (Control.builtInData != null)
+                    Control.builtInData.Clear();
+                Control.builtInData = null;
+
+                if (Control.lottoNumberMap != null)
+                    Control.lottoNumberMap.Clear();
+                Control.lottoNumberMap = null;
 
                 SystemManager.RemoveOpenList(CLASSNAME);
 
