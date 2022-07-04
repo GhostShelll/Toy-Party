@@ -46,7 +46,7 @@ namespace com.jbg.content.popup
             this.selectedNumbers = new();
 
             LottoPopup.Params p = new();
-            p.title = "@@ 로또 번호";
+            p.title = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
             p.lottoInfoTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_MSG);
             p.defaultSelectTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_DEFAULT_SELECT);
             p.btnShuffleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_SHUFFLE_BTN_TEXT);

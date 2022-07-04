@@ -23,5 +23,10 @@ namespace com.jbg.asset.data
         /// 로또 번호 선택 팝업의 토글 문구
         /// </summary>
         public const int LOTTO_SELECT_POPUP_TOGGLE_TEXT = 1103;
+
+        /// <summary>
+        /// 로또 번호 팝업의 제목 문구
+        /// </summary>
+        public const int LOTTO_POPUP_TITLE_TEXT = 1104;
     }
 }

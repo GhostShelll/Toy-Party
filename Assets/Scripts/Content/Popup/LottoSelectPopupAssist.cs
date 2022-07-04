@@ -59,7 +59,7 @@ namespace com.jbg.content.popup
             this.numberRange = 0;
 
             LottoSelectPopup.Params p = new();
-            p.title = "@@ 로또 번호";
+            p.title = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
             p.countTxt = new();
             for (int i = 0; i < this.currentNumbers.Count; i++)
                 p.countTxt.Add(this.currentNumbers[i].ToString());
