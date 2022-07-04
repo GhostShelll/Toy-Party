@@ -158,23 +158,6 @@ namespace com.jbg.asset.control
                 Control.lottoNumberMap[6][data.num6 - 1]++;
                 Control.lottoNumberMap[7][data.bonus - 1]++;
             }
-
-            // TODO[jbg] : 아래 내용 지워야함
-            System.Text.StringBuilder log = new();
-            log.AppendLine();
-            log.Append('\t').Append('1').Append('\t').Append('2').Append('\t').Append('3').Append('\t').Append('4').Append('\t').Append('5').Append('\t').Append('6').Append('\t').Append("Bonus");
-            log.AppendLine();
-
-            for (int i = 0; i < Control.MAX_NUMBER; i++)
-            {
-                log.Append(i + 1);
-                log.Append('\t').Append(Control.lottoNumberMap[1][i]).Append('\t').Append(Control.lottoNumberMap[2][i]).Append('\t').Append(Control.lottoNumberMap[3][i]);
-                log.Append('\t').Append(Control.lottoNumberMap[4][i]).Append('\t').Append(Control.lottoNumberMap[5][i]).Append('\t').Append(Control.lottoNumberMap[6][i]);
-                log.Append('\t').Append(Control.lottoNumberMap[7][i]);
-                log.AppendLine();
-            }
-
-            DebugEx.LogColor(log.ToString(), "red");
         }
 
         public static int RecentPeriod { get { return Control.builtInData.Count; } }        // 가장 최근 진행한 회차
