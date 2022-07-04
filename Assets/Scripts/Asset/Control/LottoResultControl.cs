@@ -161,6 +161,17 @@ namespace com.jbg.asset.control
 
         public static int RecentPeriod { get { return Control.builtInData.Count; } }        // 가장 최근 진행한 회차
 
+        public static List<int> GetLottoNumbers(int choiceNum)
+        {
+            if (Control.lottoNumberMap.ContainsKey(choiceNum) == false)
+            {
+                DebugEx.LogColor(string.Format("로또 추첨 순서 중에서 {0}번째 순서는 없습니다.", choiceNum), "red");
+                return null;
+            }
+
+            return Control.lottoNumberMap[choiceNum].ToList();
+        }
+
         public static void Close()
         {
             if (Control.IsOpened)
