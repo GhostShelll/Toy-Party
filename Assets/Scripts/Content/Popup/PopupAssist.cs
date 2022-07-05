@@ -6,9 +6,9 @@ using com.jbg.core.popup;
 
 namespace com.jbg.content.popup
 {
-    using Assist = SystemPopupAssist;
+    using Assist = PopupAssist;
 
-    public class SystemPopupAssist
+    public class PopupAssist
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////// OPEN POPUP FUNCTION

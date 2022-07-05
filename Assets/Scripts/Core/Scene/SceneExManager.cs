@@ -307,7 +307,7 @@ namespace com.jbg.core.scene
                 DebugEx.LogWarning("SCENE_MANAGER BAD LOGIC hideCount:" + Manager.hideCount);
 #if UNITY_EDITOR
                 string message = string.Format("BAD LOGIC\n\nBAD SceneControl.HideCount:{0}", Manager.hideCount);
-                SystemPopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, null);
+                PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, null);
 #endif  // UNITY_EDITOR
             }
 

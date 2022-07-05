@@ -56,7 +56,7 @@ namespace com.jbg.content.popup
             p.defaultSelectTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_DEFAULT_SELECT);
             p.btnShuffleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_SHUFFLE_BTN_TEXT);
 
-            SystemPopupAssist.OpenPopup("Popup_Lotto", p, this.ResultCallback, this.LoadedCallback);
+            PopupAssist.OpenPopup("Popup_Lotto", p, this.ResultCallback, this.LoadedCallback);
         }
 
         private void ResultCallback(Popup popup)

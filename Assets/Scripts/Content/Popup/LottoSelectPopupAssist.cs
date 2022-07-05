@@ -66,7 +66,7 @@ namespace com.jbg.content.popup
             p.highestToggleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_SELECT_POPUP_TOGGLE_TEXT);
             p.btnOkText = LocaleControl.GetString(LocaleCodes.BTN_OK);
 
-            SystemPopupAssist.OpenPopup("Popup_LottoSelect", p, this.ResultCallback, this.LoadedCallback);
+            PopupAssist.OpenPopup("Popup_LottoSelect", p, this.ResultCallback, this.LoadedCallback);
         }
 
         private void ResultCallback(Popup popup)
