@@ -2,7 +2,7 @@
 
 namespace com.jbg.core
 {
-    public static class GenericEx
+    public static class CollectionEx
     {
         private static System.Random random = new();
 
