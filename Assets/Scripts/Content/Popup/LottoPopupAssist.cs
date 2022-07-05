@@ -20,6 +20,7 @@ namespace com.jbg.content.popup
         private System.Action resultCallback;
 
         private Dictionary<int, List<int>> selectedNumbers;     // 각 슬롯 별로 선택된 번호들
+        private Dictionary<int, int> resultNumbers;             // 각 슬롯 별로 지정된 번호들
 
         #region Static members
         public static void Open(System.Action resultCallback)
@@ -45,6 +46,10 @@ namespace com.jbg.content.popup
                 this.selectedNumbers.Clear();
             this.selectedNumbers = new();
 
+            if (this.resultNumbers != null)
+                this.resultNumbers.Clear();
+            this.resultNumbers = new();
+
             LottoPopup.Params p = new();
             p.title = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
             p.lottoInfoTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_MSG);
@@ -64,6 +69,9 @@ namespace com.jbg.content.popup
 
             this.selectedNumbers.Clear();
             this.selectedNumbers = null;
+
+            this.resultNumbers.Clear();
+            this.resultNumbers = null;
 
             Assist.Close();
         }
@@ -115,7 +123,36 @@ namespace com.jbg.content.popup
         {
             SoundManager.Inst.Play(SoundManager.SOUND_YES);
 
-            DebugEx.Log("TODO[jbg] OnClickShuffle");
+            List<int> containCheck = new();
+            List<int> overlapCheck = new();
+
+            this.resultNumbers.Clear();
+
+            Dictionary<int, List<int>>.Enumerator enumerator1 = this.selectedNumbers.GetEnumerator();
+            while (enumerator1.MoveNext())
+            {
+                int key = enumerator1.Current.Key;
+                List<int> value = enumerator1.Current.Value;
+                value.Shuffle();
+
+                int pickNumber = value[0];
+                if (containCheck.Contains(pickNumber) == false)
+                    containCheck.Add(pickNumber);
+                else
+                    overlapCheck.Add(pickNumber);
+
+                this.resultNumbers.Add(key, pickNumber);
+            }
+
+            Dictionary<int, int>.Enumerator enumerator2 = this.resultNumbers.GetEnumerator();
+            while (enumerator2.MoveNext())
+            {
+                int key = enumerator2.Current.Key;
+                int value = enumerator2.Current.Value;
+                bool isOverlap = overlapCheck.Contains(value);
+
+                this.popupView.SetResultInfoText(key - 1, value.ToString(), isOverlap);
+            }
         }
         #endregion
     }

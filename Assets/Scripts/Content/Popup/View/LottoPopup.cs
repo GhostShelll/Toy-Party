@@ -61,7 +61,7 @@ namespace com.jbg.content.popup.view
             this.selectInfoTxt[index].text = text;
         }
 
-        public void SetResultInfoText(int index, string text)
+        public void SetResultInfoText(int index, string text, bool isOverlap)
         {
             if (this.resultInfoTxt.Length <= index)
             {
@@ -70,6 +70,7 @@ namespace com.jbg.content.popup.view
             }
 
             this.resultInfoTxt[index].text = text;
+            this.resultInfoTxt[index].color = isOverlap ? Color.red : Color.white;
         }
 
         public void OnClickSelect(GameObject go)
