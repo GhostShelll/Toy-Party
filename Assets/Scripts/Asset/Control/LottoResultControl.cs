@@ -18,11 +18,10 @@ namespace com.jbg.asset.control
     {
         public static bool IsOpened { get; private set; }
 
-        private static readonly Dictionary<int, LottoResultData> builtInData = new();
-        private static readonly Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
+        private static Dictionary<int, LottoResultData> builtInData = new();
+        private static Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
 
         private const string CLASSNAME = "LottoResultControl";
-        private const int MAX_NUMBER = 45;
 
         public static void Open()
         {
@@ -48,7 +47,7 @@ namespace com.jbg.asset.control
             // 빌트인 정보 저장
             List<LottoResultData> builtInDataList = JsonConvert.DeserializeObject<List<LottoResultData>>(csvToJSON);
 
-            Control.builtInData.Clear();
+            Control.builtInData = new();
             for (int i = 0; i < builtInDataList.Count; i++)
             {
                 if (Control.builtInData.ContainsKey(builtInDataList[i].code) == false)
@@ -135,7 +134,7 @@ namespace com.jbg.asset.control
 #endif  // CHECK_LOTTO_NUMBERS
 
             // 추첨 순서 별 번호 나온 횟수를 0으로 초기화
-            Control.lottoNumberMap.Clear();
+            Control.lottoNumberMap = new();
             Control.lottoNumberMap.Add(1, Enumerable.Repeat(0, 45).ToList());
             Control.lottoNumberMap.Add(2, Enumerable.Repeat(0, 45).ToList());
             Control.lottoNumberMap.Add(3, Enumerable.Repeat(0, 45).ToList());
@@ -158,32 +157,34 @@ namespace com.jbg.asset.control
                 Control.lottoNumberMap[6][data.num6 - 1]++;
                 Control.lottoNumberMap[7][data.bonus - 1]++;
             }
-
-            // TODO[jbg] : 아래 내용 지워야함
-            System.Text.StringBuilder log = new();
-            log.AppendLine();
-            log.Append('\t').Append('1').Append('\t').Append('2').Append('\t').Append('3').Append('\t').Append('4').Append('\t').Append('5').Append('\t').Append('6').Append('\t').Append("Bonus");
-            log.AppendLine();
-
-            for (int i = 0; i < Control.MAX_NUMBER; i++)
-            {
-                log.Append(i + 1);
-                log.Append('\t').Append(Control.lottoNumberMap[1][i]).Append('\t').Append(Control.lottoNumberMap[2][i]).Append('\t').Append(Control.lottoNumberMap[3][i]);
-                log.Append('\t').Append(Control.lottoNumberMap[4][i]).Append('\t').Append(Control.lottoNumberMap[5][i]).Append('\t').Append(Control.lottoNumberMap[6][i]);
-                log.Append('\t').Append(Control.lottoNumberMap[7][i]);
-                log.AppendLine();
-            }
-
-            DebugEx.LogColor(log.ToString(), "red");
         }
 
         public static int RecentPeriod { get { return Control.builtInData.Count; } }        // 가장 최근 진행한 회차
+
+        public static List<int> GetLottoNumbers(int choiceNum)
+        {
+            if (Control.lottoNumberMap.ContainsKey(choiceNum) == false)
+            {
+                DebugEx.LogColor(string.Format("로또 추첨 순서 중에서 {0}번째 순서는 없습니다.", choiceNum), "red");
+                return null;
+            }
+
+            return Control.lottoNumberMap[choiceNum].ToList();
+        }
 
         public static void Close()
         {
             if (Control.IsOpened)
             {
                 Control.IsOpened = false;
+
+                if (Control.builtInData != null)
+                    Control.builtInData.Clear();
+                Control.builtInData = null;
+
+                if (Control.lottoNumberMap != null)
+                    Control.lottoNumberMap.Clear();
+                Control.lottoNumberMap = null;
 
                 SystemManager.RemoveOpenList(CLASSNAME);
 
