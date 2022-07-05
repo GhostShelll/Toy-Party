@@ -188,14 +188,14 @@ namespace com.jbg.core.scene
                                 GameObject.Destroy(cam.gameObject);
                         }
 
-                        if (0 < Manager.hideCount)
+                        SceneView sceneView = Manager.curSceneObj.GetComponent<SceneView>();
+
+                        if (sceneView != null && Manager.hideCount > 0)
                         {
                             DebugEx.Log(string.Format("UPDATE (HideCount : {0})", Manager.hideCount));
 
-                            Manager.curSceneObj.transform.HideTransform();
+                            sceneView.HideCanvases();
                         }
-
-                        SceneView sceneView = Manager.curSceneObj.GetComponent<SceneView>();
 
                         if (sceneView != null && sceneView.CanvasArr != null)
                         {
@@ -314,7 +314,11 @@ namespace com.jbg.core.scene
             if (Manager.hideCount == 0)
             {
                 if (Manager.curSceneObj != null)
-                    Manager.curSceneObj.transform.ShowTransform();
+                {
+                    SceneView sceneView = Manager.curSceneObj.GetComponent<SceneView>();
+                    if (sceneView != null)
+                        sceneView.ShowCanvases();
+                }
             }
         }
 
@@ -327,7 +331,11 @@ namespace com.jbg.core.scene
             if (Manager.hideCount == 1)
             {
                 if (Manager.curSceneObj != null)
-                    Manager.curSceneObj.transform.HideTransform();
+                {
+                    SceneView sceneView = Manager.curSceneObj.GetComponent<SceneView>();
+                    if (sceneView != null)
+                        sceneView.HideCanvases();
+                }
             }
         }
 
