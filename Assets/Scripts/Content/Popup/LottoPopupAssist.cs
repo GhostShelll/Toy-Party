@@ -67,10 +67,12 @@ namespace com.jbg.content.popup
             this.resultCallback?.Invoke();
             this.resultCallback = null;
 
-            this.selectedNumbers.Clear();
+            if (this.selectedNumbers != null)
+                this.selectedNumbers.Clear();
             this.selectedNumbers = null;
 
-            this.resultNumbers.Clear();
+            if (this.resultNumbers != null)
+                this.resultNumbers.Clear();
             this.resultNumbers = null;
 
             Assist.Close();
