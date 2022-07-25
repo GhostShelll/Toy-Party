@@ -51,7 +51,7 @@ namespace com.jbg.content.popup
             this.resultNumbers = new();
 
             LottoPopup.Params p = new();
-            p.title = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
+            p.title = string.Format(LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT), LottoResultControl.RecentPeriod + 1);
             p.lottoInfoTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_MSG);
             p.defaultSelectTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_DEFAULT_SELECT);
             p.btnShuffleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_SHUFFLE_BTN_TEXT);
