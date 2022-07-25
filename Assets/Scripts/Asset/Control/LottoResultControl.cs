@@ -42,8 +42,6 @@ namespace com.jbg.asset.control
                 new CSVParser.Info("bonus", CSVParser.Info.TYPE.Plain),
             }, true, 1);
 
-            AssetManager.OpenStorage<int, LottoResultData>(csvToJSON, (v) => { return v.code; });
-
             // 빌트인 정보 저장
             List<LottoResultData> builtInDataList = JsonConvert.DeserializeObject<List<LottoResultData>>(csvToJSON);
 
@@ -187,8 +185,6 @@ namespace com.jbg.asset.control
                 Control.lottoNumberMap = null;
 
                 SystemManager.RemoveOpenList(CLASSNAME);
-
-                AssetManager.CloseStorage<int, LottoResultData>();
             }
         }
     }

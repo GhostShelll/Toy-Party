@@ -10,7 +10,6 @@ using com.jbg.core.manager;
 namespace com.jbg.asset.control
 {
     using Control = LocaleControl;
-    using LocaleStorage = Storage<int, LocaleData>;
 
     public class LocaleControl
     {
@@ -59,8 +58,6 @@ namespace com.jbg.asset.control
                 new CSVParser.Info("enUS", CSVParser.Info.TYPE.String),
             }, true, 1);
 
-            AssetManager.OpenStorage<int, LocaleData>(jsonBuiltInLocale, (v) => { return v.code; });
-
             // 빌트인 로케일 정보 저장
             List<LocaleData> builtInLocaleList = JsonConvert.DeserializeObject<List<LocaleData>>(jsonBuiltInLocale);
 
@@ -93,24 +90,26 @@ namespace com.jbg.asset.control
                 Control.IsOpened = false;
 
                 SystemManager.RemoveOpenList(CLASSNAME);
-
-                AssetManager.CloseStorage<int, LocaleData>();
             }
         }
 
         public static string GetString(int code)
         {
-            LocaleData localeData = LocaleStorage.Find(code);
-            if (localeData != null)
-            {
-                switch (Control.LanguageCode)
-                {
-                    case Language.koKR:
-                        return localeData.koKR;
-                    case Language.enUS:
-                        return localeData.enUS;
-                }
-            }
+            // TODO[jbg] : 사용해야함
+            //if (Control.builtInLocale.ContainsKey(code))
+            //{
+            //    LocaleData localeData = Control.builtInLocale[code];
+            //    if (localeData != null)
+            //    {
+            //        switch (Control.LanguageCode)
+            //        {
+            //            case Language.koKR:
+            //                return localeData.koKR;
+            //            case Language.enUS:
+            //                return localeData.enUS;
+            //        }
+            //    }
+            //}
 
             return Control.GetString_BuiltIn(code);
         }
