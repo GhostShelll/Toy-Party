@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
 using Newtonsoft.Json;
+using GoogleSheetsToUnity;
 
 using com.jbg.asset.data;
 using com.jbg.core;
@@ -21,6 +23,7 @@ namespace com.jbg.asset.control
         }
 
         public static bool IsOpened { get; private set; }
+        public static bool LoadingDone { get; private set; }
 
         public static Language LanguageCode
         {
@@ -41,8 +44,10 @@ namespace com.jbg.asset.control
         }
 
         private static readonly Dictionary<int, LocaleData> builtInLocale = new();
+        private static readonly Dictionary<int, LocaleData> downloadedLocale = new();
 
         private const string CLASSNAME = "LocaleControl";
+        public const string ASSOCIATED_SHEET_NAME = "LocaleData";
 
         public static void Open()
         {
@@ -50,6 +55,8 @@ namespace com.jbg.asset.control
             Control.IsOpened = true;
 
             SystemManager.AddOpenList(CLASSNAME);
+
+            Control.LoadingDone = false;
 
             string jsonBuiltInLocale = Resources.Load<TextAsset>("BuiltInAsset/LocaleData").text.CsvToJson(new CSVParser.Info[]
             {
@@ -75,12 +82,105 @@ namespace com.jbg.asset.control
                 }
             }
 
+            Control.downloadedLocale.Clear();
+
             if (Control.LanguageCode == Language.Invaild)
             {
                 Control.LanguageCode = Language.enUS;
 
                 DebugEx.Log("AUTO SET LANGUAGE:" + Control.LanguageCode);
             }
+        }
+
+        public static IEnumerator LoadAsync()
+        {
+            Control.LoadingDone = false;
+
+            // 로딩 과정 시작
+            SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME), (spreadSheet) =>
+            {
+                Dictionary<string, GSTU_Cell>.Enumerator enumerator = spreadSheet.Cells.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    GSTU_Cell cell = enumerator.Current.Value;
+
+                    switch (cell.columnId)
+                    {
+                        case "code":
+                            {
+                                bool enableParse = int.TryParse(cell.value, out int code);
+                                if (enableParse)
+                                {
+                                    if (Control.downloadedLocale.ContainsKey(code) == false)
+                                    {
+                                        Control.downloadedLocale.Add(code, new LocaleData()
+                                        {
+                                            code = code,
+                                            koKR = "@@값이_필요함",
+                                            enUS = "@@NEED_CAPTION",
+                                        });
+                                    }
+                                    else
+                                    {
+                                        DebugEx.LogColor(string.Format("[LOCALE CHECK] Code {0} 값이 중복입니다.", code), "red");
+                                    }
+                                }
+                            }
+                            break;
+
+                        case "koKR":
+                            {
+                                bool codeIsCorrect = int.TryParse(cell.rowId, out int code);
+                                if (codeIsCorrect)
+                                {
+                                    if (Control.downloadedLocale.ContainsKey(code) == false)
+                                    {
+                                        Control.downloadedLocale.Add(code, new LocaleData()
+                                        {
+                                            code = code,
+                                            koKR = cell.value,
+                                            enUS = "@@NEED_CAPTION",
+                                        });
+                                    }
+                                    else
+                                    {
+                                        Control.downloadedLocale[code].koKR = cell.value;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case "enUS":
+                            {
+                                bool codeIsCorrect = int.TryParse(cell.rowId, out int code);
+                                if (codeIsCorrect)
+                                {
+                                    if (Control.downloadedLocale.ContainsKey(code) == false)
+                                    {
+                                        Control.downloadedLocale.Add(code, new LocaleData()
+                                        {
+                                            code = code,
+                                            koKR = "@@값이_필요함",
+                                            enUS = cell.value,
+                                        });
+                                    }
+                                    else
+                                    {
+                                        Control.downloadedLocale[code].enUS = cell.value;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                Control.LoadingDone = true;
+            });
+
+            while (Control.LoadingDone == false)
+                yield return null;
+
+            yield break;
         }
 
         public static void Close()
@@ -95,21 +195,20 @@ namespace com.jbg.asset.control
 
         public static string GetString(int code)
         {
-            // TODO[jbg] : 사용해야함
-            //if (Control.builtInLocale.ContainsKey(code))
-            //{
-            //    LocaleData localeData = Control.builtInLocale[code];
-            //    if (localeData != null)
-            //    {
-            //        switch (Control.LanguageCode)
-            //        {
-            //            case Language.koKR:
-            //                return localeData.koKR;
-            //            case Language.enUS:
-            //                return localeData.enUS;
-            //        }
-            //    }
-            //}
+            if (Control.downloadedLocale.ContainsKey(code))
+            {
+                LocaleData localeData = Control.downloadedLocale[code];
+                if (localeData != null)
+                {
+                    switch (Control.LanguageCode)
+                    {
+                        case Language.koKR:
+                            return localeData.koKR;
+                        case Language.enUS:
+                            return localeData.enUS;
+                    }
+                }
+            }
 
             return Control.GetString_BuiltIn(code);
         }

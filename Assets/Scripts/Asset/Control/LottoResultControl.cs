@@ -1,5 +1,6 @@
 //#define CHECK_LOTTO_NUMBERS
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,11 +18,13 @@ namespace com.jbg.asset.control
     public class LottoResultControl
     {
         public static bool IsOpened { get; private set; }
+        public static bool LoadingDone { get; private set; }
 
         private static Dictionary<int, LottoResultData> builtInData = new();
         private static Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
 
         private const string CLASSNAME = "LottoResultControl";
+        public const string ASSOCIATED_SHEET_NAME = "LottoResultData";
 
         public static void Open()
         {
@@ -155,6 +158,13 @@ namespace com.jbg.asset.control
                 Control.lottoNumberMap[6][data.num6 - 1]++;
                 Control.lottoNumberMap[7][data.bonus - 1]++;
             }
+        }
+
+        public static IEnumerator LoadAsync()
+        {
+            // TODO[jbg] : 로딩 과정 구현
+
+            yield break;
         }
 
         public static int RecentPeriod { get { return Control.builtInData.Count; } }        // 가장 최근 진행한 회차
