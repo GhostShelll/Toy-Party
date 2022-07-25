@@ -67,9 +67,9 @@ namespace com.jbg.content.scene.view
 
         public void UpdateProgress(string assetName, float progress)
         {
-            if (progress == 0f)
+            if (progress == 0f || progress == 1f)
             {
-                this.progress.fillAmount = 0f;
+                this.progress.fillAmount = progress;
                 this.progressTxt.text = string.Empty;
                 return;
             }

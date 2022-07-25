@@ -58,11 +58,13 @@ namespace com.jbg.asset
                 Manager.CurrentAsset = assetName;
                 Manager.CurrentProgress = currentCount / totalCount;
 
-                while (task.MoveNext())
-                    yield return null;
+                yield return task;
 
                 currentCount++;
             }
+
+            Manager.CurrentAsset = string.Empty;
+            Manager.CurrentProgress = currentCount / totalCount;
 
             Manager.LoadingDone = true;
 
