@@ -10,8 +10,6 @@ namespace com.jbg.core.manager
 
         private void Awake()
         {
-            GameObject.DontDestroyOnLoad(this.gameObject);
-
             CoroutineManager.Inst = this;
         }
 
