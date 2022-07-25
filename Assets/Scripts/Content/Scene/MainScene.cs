@@ -1,3 +1,6 @@
+using UnityEngine;
+
+using com.jbg.asset;
 using com.jbg.asset.control;
 using com.jbg.asset.data;
 using com.jbg.content.popup;
@@ -13,7 +16,8 @@ namespace com.jbg.content.scene
 
         public enum STATE
         {
-            Wait,
+            AssetLoad,
+            WaitDone,
         }
 
         protected override void OnOpen()
@@ -23,13 +27,16 @@ namespace com.jbg.content.scene
             this.sceneView = (MainView)this.SceneView;
 
             this.sceneView.BindEvent(MainView.Event.LottoSelect, this.OnClickLottoSelect);
+            this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
 
             MainView.Params p = new();
             p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
+            p.progressTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
+            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
 
             this.sceneView.OnOpen(p);
 
-            this.SetStateWait();
+            this.SetStateAssetLoad();
         }
 
         protected override void OnClose()
@@ -37,13 +44,44 @@ namespace com.jbg.content.scene
             base.OnClose();
 
             this.sceneView.RemoveEvent(MainView.Event.LottoSelect);
+            this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
         }
 
-        private void SetStateWait()
+        private void SetStateAssetLoad()
         {
-            this.SetState((int)STATE.Wait);
+            this.SetState((int)STATE.AssetLoad);
 
-            this.OnClickLottoSelect(0, 0);
+            this.sceneView.SetStateAssetLoad();
+
+            // 에셋 로드 시작
+            Coroutine task = CoroutineManager.AddTask(AssetManager.LoadAsync());
+
+            this.AddUpdateFunc(() =>
+            {
+                if (AssetManager.LoadingDone)
+                {
+                    // 에셋 로드 완료함
+                    if (task != null)
+                        CoroutineManager.RemoveTask(task);
+
+                    this.SetStateWaitDone();
+                }
+                else
+                {
+                    // 에셋 로드중
+                    string currentAsset = AssetManager.CurrentAsset;
+                    float currentProgress = AssetManager.CurrentProgress;
+
+                    this.sceneView.UpdateProgress(currentAsset, currentProgress);
+                }
+            });
+        }
+
+        private void SetStateWaitDone()
+        {
+            this.SetState((int)STATE.WaitDone);
+
+            this.sceneView.SetStateWaitDone();
         }
 
         private void OnClickLottoSelect(int eventNum, object obj)
@@ -54,6 +92,14 @@ namespace com.jbg.content.scene
             {
 
             });
+        }
+
+        private void OnClickRefreshAsset(int eventNum, object obj)
+        {
+            SoundManager.Inst.Play(SoundManager.SOUND_YES);
+
+            // 에셋 갱신 시작
+            this.SetStateAssetLoad();
         }
     }
 }
