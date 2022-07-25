@@ -61,7 +61,7 @@ namespace com.jbg.content.popup
             this.numberRange = 0;
 
             LottoSelectPopup.Params p = new();
-            p.title = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
+            p.title = string.Format(LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT), LottoResultControl.RecentPeriod + 1);
             p.countTxt = new();
             for (int i = 0; i < this.currentNumbers.Count; i++)
                 p.countTxt.Add(this.currentNumbers[i].ToString());

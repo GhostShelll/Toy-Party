@@ -30,7 +30,7 @@ namespace com.jbg.content.scene
             this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
 
             MainView.Params p = new();
-            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
+            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_LOTTO_BTN_TEXT);
             p.progressTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
             p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
 
