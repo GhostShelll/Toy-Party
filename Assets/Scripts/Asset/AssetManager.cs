@@ -19,8 +19,6 @@ namespace com.jbg.asset
         private const string CLASSNAME = "AssetManager";
         public const string ASSOCIATED_SHEET = "1tJmnVzNu45UkLEqM_6hAP-3sPcxtFnBBknsPM-7wpJA";
 
-        public static Dictionary<string, IEnumerator> loadList = new();
-
         public static void Open()
         {
             Manager.Close();
@@ -32,10 +30,6 @@ namespace com.jbg.asset
             Manager.CurrentAsset = string.Empty;
             Manager.CurrentProgress = 0f;
 
-            // 로딩할 것들 목록 만들기
-            Manager.loadList.Add(LocaleControl.ASSOCIATED_SHEET_NAME, LocaleControl.LoadAsync());
-            Manager.loadList.Add(LottoResultControl.ASSOCIATED_SHEET_NAME, LottoResultControl.LoadAsync());
-
             // 각종 에셋 오픈
             LocaleControl.Open();
             LottoResultControl.Open();
@@ -43,13 +37,18 @@ namespace com.jbg.asset
 
         public static IEnumerator LoadAsync()
         {
+            // 로딩 과정 시작
             Manager.LoadingDone = false;
 
-            // 로딩 과정 시작
-            float currentCount = 0f;
-            float totalCount = Manager.loadList.Count;
+            // 로딩할 것들 목록 만들기
+            Dictionary<string, IEnumerator> loadList = new();
+            loadList.Add(LocaleControl.ASSOCIATED_SHEET_NAME, LocaleControl.LoadAsync());
+            loadList.Add(LottoResultControl.ASSOCIATED_SHEET_NAME, LottoResultControl.LoadAsync());
 
-            Dictionary<string, IEnumerator>.Enumerator enumerator = Manager.loadList.GetEnumerator();
+            float currentCount = 0f;
+            float totalCount = loadList.Count;
+
+            Dictionary<string, IEnumerator>.Enumerator enumerator = loadList.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 string assetName = enumerator.Current.Key;

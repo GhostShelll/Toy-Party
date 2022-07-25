@@ -103,6 +103,7 @@ namespace com.jbg.asset.control
                 }
 
                 // 추첨 순서 별 번호 나온 횟수를 0으로 초기화
+                Control.lottoNumberMap.Clear();
                 Control.lottoNumberMap.Add(1, Enumerable.Repeat(0, 45).ToList());
                 Control.lottoNumberMap.Add(2, Enumerable.Repeat(0, 45).ToList());
                 Control.lottoNumberMap.Add(3, Enumerable.Repeat(0, 45).ToList());
