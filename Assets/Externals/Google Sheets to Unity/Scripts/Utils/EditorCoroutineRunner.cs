@@ -253,6 +253,8 @@ namespace GoogleSheetsToUnity.ThirdPary
                         // These dont make sense in editor, so we will treat them the same as a null return...
                         isWaiting = false;
                     }
+#if CODE_EDIT_JBG
+#else
                     else if (currentType == typeof(WWW))
                     {
                         // Web download request, lets see if its done!
@@ -262,6 +264,7 @@ namespace GoogleSheetsToUnity.ThirdPary
                             isWaiting = true;
                         }
                     }
+#endif  // CODE_EDIT_JBG
                     else if (currentType == typeof(UnityWebRequestAsyncOperation))
                     {
                         var webRequest = current as UnityWebRequestAsyncOperation;
