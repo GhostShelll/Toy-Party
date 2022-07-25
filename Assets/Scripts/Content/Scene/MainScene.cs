@@ -1,3 +1,6 @@
+using UnityEngine;
+
+using com.jbg.asset;
 using com.jbg.asset.control;
 using com.jbg.asset.data;
 using com.jbg.content.popup;
@@ -50,12 +53,27 @@ namespace com.jbg.content.scene
 
             this.sceneView.SetStateAssetLoad();
 
-            // TODO[jbg] : 에셋 로드 시작
+            // 에셋 로드 시작
+            Coroutine task = CoroutineManager.AddTask(AssetManager.LoadAsync());
 
             this.AddUpdateFunc(() =>
             {
-                // TODO[jbg] : 에셋 로드 완료 후
-                //this.SetStateWaitDone();
+                if (AssetManager.LoadingDone)
+                {
+                    // 에셋 로드 완료함
+                    if (task != null)
+                        CoroutineManager.RemoveTask(task);
+
+                    this.SetStateWaitDone();
+                }
+                else
+                {
+                    // 에셋 로드중
+                    string currentAsset = AssetManager.CurrentAsset;
+                    float currentProgress = AssetManager.CurrentProgress;
+
+                    this.sceneView.UpdateProgress(currentAsset, currentProgress);
+                }
             });
         }
 
