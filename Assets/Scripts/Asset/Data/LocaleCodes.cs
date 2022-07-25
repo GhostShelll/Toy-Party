@@ -33,5 +33,15 @@ namespace com.jbg.asset.data
         /// 로또 번호 선택 팝업의 두번째 토글 문구
         /// </summary>
         public const int LOTTO_SELECT_POPUP_TOGGLE_TEXT_2 = 1105;
+
+        /// <summary>
+        /// 에셋 로딩 문구
+        /// </summary>
+        public const int MAIN_SCENE_ASSET_LOADING_TEXT = 1200;
+
+        /// <summary>
+        /// 에셋 갱신 버튼 문구
+        /// </summary>
+        public const int MAIN_SCENE_ASSET_LOADING_BTN_TEXT = 1201;
     }
 }

@@ -28,8 +28,8 @@ namespace com.jbg.content.scene
 
             MainView.Params p = new();
             p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
-            p.progressTxt = "@@{0} 에셋 다운로드 진행중";
-            p.refreshBtnTxt = "@@에셋 갱신";
+            p.progressTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
+            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
 
             this.sceneView.OnOpen(p);
 
