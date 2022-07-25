@@ -99,78 +99,37 @@ namespace com.jbg.asset.control
             // 로딩 과정 시작
             SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME), (spreadSheet) =>
             {
-                Dictionary<string, GSTU_Cell>.Enumerator enumerator = spreadSheet.Cells.GetEnumerator();
+                Dictionary<int, List<GSTU_Cell>>.Enumerator enumerator = spreadSheet.rows.primaryDictionary.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
-                    GSTU_Cell cell = enumerator.Current.Value;
+                    int rowNum = enumerator.Current.Key;
+                    if (rowNum == 1)        // 1번 행은 '열의 제목' 행이기 때문에 생략
+                        continue;
 
-                    switch (cell.columnId)
+                    List<GSTU_Cell> cellList = enumerator.Current.Value;        // code, koKR, enUS 순으로 정렬됨
+
+                    bool codeIsCorrect = int.TryParse(cellList[0].value, out int code);
+                    if (codeIsCorrect == false)
                     {
-                        case "code":
-                            {
-                                bool enableParse = int.TryParse(cell.value, out int code);
-                                if (enableParse)
-                                {
-                                    if (Control.downloadedLocale.ContainsKey(code) == false)
-                                    {
-                                        Control.downloadedLocale.Add(code, new LocaleData()
-                                        {
-                                            code = code,
-                                            koKR = "@@값이_필요함",
-                                            enUS = "@@NEED_CAPTION",
-                                        });
-                                    }
-                                    else
-                                    {
-                                        DebugEx.LogColor(string.Format("[LOCALE CHECK] Code {0} 값이 중복입니다.", code), "red");
-                                    }
-                                }
-                            }
-                            break;
+                        DebugEx.LogColor(string.Format("[LOCALE CHECK] {0}번째 행의 Code 값 int.Parse()를 실패했습니다.", rowNum), "red");
+                        continue;
+                    }
 
-                        case "koKR":
-                            {
-                                bool codeIsCorrect = int.TryParse(cell.rowId, out int code);
-                                if (codeIsCorrect)
-                                {
-                                    if (Control.downloadedLocale.ContainsKey(code) == false)
-                                    {
-                                        Control.downloadedLocale.Add(code, new LocaleData()
-                                        {
-                                            code = code,
-                                            koKR = cell.value,
-                                            enUS = "@@NEED_CAPTION",
-                                        });
-                                    }
-                                    else
-                                    {
-                                        Control.downloadedLocale[code].koKR = cell.value;
-                                    }
-                                }
-                            }
-                            break;
+                    if (cellList.Count != 3)
+                    {
+                        DebugEx.LogColor(string.Format("[LOCALE CHECK] Code {0}의 열 갯수가 맞지 않습니다.", code), "red");
+                        continue;
+                    }
 
-                        case "enUS":
-                            {
-                                bool codeIsCorrect = int.TryParse(cell.rowId, out int code);
-                                if (codeIsCorrect)
-                                {
-                                    if (Control.downloadedLocale.ContainsKey(code) == false)
-                                    {
-                                        Control.downloadedLocale.Add(code, new LocaleData()
-                                        {
-                                            code = code,
-                                            koKR = "@@값이_필요함",
-                                            enUS = cell.value,
-                                        });
-                                    }
-                                    else
-                                    {
-                                        Control.downloadedLocale[code].enUS = cell.value;
-                                    }
-                                }
-                            }
-                            break;
+
+                    if (Control.builtInLocale.ContainsKey(code) == false)
+                    {
+                        Control.builtInLocale.Add(code, new LocaleData()
+                        {
+                            code = code,
+                            koKR = cellList[1].value,
+                            enUS = cellList[2].value,
+                        });
                     }
                 }
 
