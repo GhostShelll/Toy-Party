@@ -13,7 +13,8 @@ namespace com.jbg.content.scene
 
         public enum STATE
         {
-            Wait,
+            AssetLoad,
+            WaitDone,
         }
 
         protected override void OnOpen()
@@ -23,13 +24,16 @@ namespace com.jbg.content.scene
             this.sceneView = (MainView)this.SceneView;
 
             this.sceneView.BindEvent(MainView.Event.LottoSelect, this.OnClickLottoSelect);
+            this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
 
             MainView.Params p = new();
             p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
+            p.progressTxt = "@@{0} 에셋 다운로드 진행중";
+            p.refreshBtnTxt = "@@에셋 갱신";
 
             this.sceneView.OnOpen(p);
 
-            this.SetStateWait();
+            this.SetStateAssetLoad();
         }
 
         protected override void OnClose()
@@ -37,13 +41,29 @@ namespace com.jbg.content.scene
             base.OnClose();
 
             this.sceneView.RemoveEvent(MainView.Event.LottoSelect);
+            this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
         }
 
-        private void SetStateWait()
+        private void SetStateAssetLoad()
         {
-            this.SetState((int)STATE.Wait);
+            this.SetState((int)STATE.AssetLoad);
 
-            this.OnClickLottoSelect(0, 0);
+            this.sceneView.SetStateAssetLoad();
+
+            // TODO[jbg] : 에셋 로드 시작
+
+            this.AddUpdateFunc(() =>
+            {
+                // TODO[jbg] : 에셋 로드 완료 후
+                //this.SetStateWaitDone();
+            });
+        }
+
+        private void SetStateWaitDone()
+        {
+            this.SetState((int)STATE.WaitDone);
+
+            this.sceneView.SetStateWaitDone();
         }
 
         private void OnClickLottoSelect(int eventNum, object obj)
@@ -54,6 +74,14 @@ namespace com.jbg.content.scene
             {
 
             });
+        }
+
+        private void OnClickRefreshAsset(int eventNum, object obj)
+        {
+            SoundManager.Inst.Play(SoundManager.SOUND_YES);
+
+            // 에셋 갱신 시작
+            this.SetStateAssetLoad();
         }
     }
 }
