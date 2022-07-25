@@ -11,13 +11,17 @@ using UnityEngine.Events;
 using UnityEngine.Networking;
 using System.Linq;
 
+#if CODE_EDIT_JBG
+using com.jbg.core.manager;
+#endif
+
 namespace GoogleSheetsToUnity
 {
     /// <summary>
     /// Partial class for the spreadsheet manager to handle all private functions
     /// </summary>
     public partial class SpreadsheetManager
-    {   
+    {
         /// <summary>
         /// Chekcs for a valid token and if its out of date attempt to refresh it
         /// </summary>
@@ -34,7 +38,7 @@ namespace GoogleSheetsToUnity
                 yield return EditorCoroutineRunner.StartCoroutine(GoogleAuthrisationHelper.CheckForRefreshOfToken());
             }
 #endif
-        }    
+        }
 
         /// <summary>
         /// Reads information from a spreadsheet
@@ -60,11 +64,11 @@ namespace GoogleSheetsToUnity
 #if UNITY_EDITOR
             else
             {
-                EditorCoroutineRunner.StartCoroutine(Read(request,  search, containsMergedCells, callback));
+                EditorCoroutineRunner.StartCoroutine(Read(request, search, containsMergedCells, callback));
             }
 #endif
         }
-        
+
         /// <summary>
         /// Reads the spread sheet and callback with the results
         /// </summary>
@@ -90,12 +94,22 @@ namespace GoogleSheetsToUnity
             {
                 yield return request.SendWebRequest();
 
-                if(string.IsNullOrEmpty(request.downloadHandler.text) || request.downloadHandler.text == "{}")
+                if (string.IsNullOrEmpty(request.downloadHandler.text) || request.downloadHandler.text == "{}")
                 {
                     Debug.LogWarning("Unable to Retreive data from google sheets");
                     yield break;
                 }
 
+#if CODE_EDIT_JBG
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("<color=red>[SHEET READ ERROR] 앱을 재실행합니다.</color>");
+
+                    GameRestart.StartScene();
+
+                    yield break;
+                }
+#endif  // CODE_EDIT_JBG
 
                 ValueRange rawData = JSON.Load(request.downloadHandler.text).Make<ValueRange>();
                 GSTU_SpreadsheetResponce responce = new GSTU_SpreadsheetResponce(rawData);
@@ -118,7 +132,7 @@ namespace GoogleSheetsToUnity
 
                 if (callback != null)
                 {
-                    callback(new GstuSpreadSheet(responce, search.titleColumn,search.titleRow));
+                    callback(new GstuSpreadSheet(responce, search.titleColumn, search.titleRow));
                 }
             }
         }
