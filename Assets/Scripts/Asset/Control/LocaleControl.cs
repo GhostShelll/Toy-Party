@@ -43,11 +43,13 @@ namespace com.jbg.asset.control
             }
         }
 
-        private static readonly Dictionary<int, LocaleData> builtInLocale = new();
-        private static readonly Dictionary<int, LocaleData> downloadedLocale = new();
+        private static Dictionary<int, LocaleData> builtInLocale = new();
+        private static Dictionary<int, LocaleData> downloadedLocale = new();
 
         private const string CLASSNAME = "LocaleControl";
         public const string ASSOCIATED_SHEET_NAME = "LocaleData";
+        private const string START_CELL = "A1";
+        private const string END_CELL = "C100";
 
         public static void Open()
         {
@@ -58,6 +60,9 @@ namespace com.jbg.asset.control
 
             Control.LoadingDone = false;
 
+            Control.builtInLocale = new();
+            Control.downloadedLocale = new();
+
             string jsonBuiltInLocale = Resources.Load<TextAsset>("BuiltInAsset/LocaleData").text.CsvToJson(new CSVParser.Info[]
             {
                 new CSVParser.Info("code", CSVParser.Info.TYPE.Plain),
@@ -67,8 +72,6 @@ namespace com.jbg.asset.control
 
             // 빌트인 로케일 정보 저장
             List<LocaleData> builtInLocaleList = JsonConvert.DeserializeObject<List<LocaleData>>(jsonBuiltInLocale);
-
-            Control.builtInLocale.Clear();
             for (int i = 0; i < builtInLocaleList.Count; i++)
             {
                 if (Control.builtInLocale.ContainsKey(builtInLocaleList[i].code) == false)
@@ -81,8 +84,6 @@ namespace com.jbg.asset.control
                     });
                 }
             }
-
-            Control.downloadedLocale.Clear();
 
             if (Control.LanguageCode == Language.Invaild)
             {
@@ -97,7 +98,7 @@ namespace com.jbg.asset.control
             Control.LoadingDone = false;
 
             // 로딩 과정 시작
-            SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME), (spreadSheet) =>
+            SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME, Control.START_CELL, Control.END_CELL), (spreadSheet) =>
             {
                 Dictionary<int, List<GSTU_Cell>>.Enumerator enumerator = spreadSheet.rows.primaryDictionary.GetEnumerator();
                 while (enumerator.MoveNext())
@@ -121,10 +122,9 @@ namespace com.jbg.asset.control
                         continue;
                     }
 
-
-                    if (Control.builtInLocale.ContainsKey(code) == false)
+                    if (Control.downloadedLocale.ContainsKey(code) == false)
                     {
-                        Control.builtInLocale.Add(code, new LocaleData()
+                        Control.downloadedLocale.Add(code, new LocaleData()
                         {
                             code = code,
                             koKR = cellList[1].value,
@@ -147,6 +147,14 @@ namespace com.jbg.asset.control
             if (Control.IsOpened)
             {
                 Control.IsOpened = false;
+
+                if (Control.builtInLocale != null)
+                    Control.builtInLocale.Clear();
+                Control.builtInLocale = null;
+
+                if (Control.downloadedLocale != null)
+                    Control.downloadedLocale.Clear();
+                Control.downloadedLocale = null;
 
                 SystemManager.RemoveOpenList(CLASSNAME);
             }

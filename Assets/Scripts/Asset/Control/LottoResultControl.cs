@@ -1,11 +1,8 @@
-//#define CHECK_LOTTO_NUMBERS
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using UnityEngine;
-using Newtonsoft.Json;
+using GoogleSheetsToUnity;
 
 using com.jbg.asset.data;
 using com.jbg.core;
@@ -19,12 +16,15 @@ namespace com.jbg.asset.control
     {
         public static bool IsOpened { get; private set; }
         public static bool LoadingDone { get; private set; }
+        public static int RecentPeriod { get { return Control.assetData.Count; } }        // 가장 최근 진행한 회차
 
-        private static Dictionary<int, LottoResultData> builtInData = new();
+        private static Dictionary<int, LottoResultData> assetData = new();
         private static Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
 
         private const string CLASSNAME = "LottoResultControl";
         public const string ASSOCIATED_SHEET_NAME = "LottoResultData";
+        private const string START_CELL = "A1";
+        private const string END_CELL = "H1500";
 
         public static void Open()
         {
@@ -33,141 +33,125 @@ namespace com.jbg.asset.control
 
             SystemManager.AddOpenList(CLASSNAME);
 
-            string csvToJSON = Resources.Load<TextAsset>("BuiltInAsset/LottoResultData").text.CsvToJson(new CSVParser.Info[]
-            {
-                new CSVParser.Info("code", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num1", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num2", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num3", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num4", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num5", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num6", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("bonus", CSVParser.Info.TYPE.Plain),
-            }, true, 1);
+            Control.LoadingDone = false;
 
-            // 빌트인 정보 저장
-            List<LottoResultData> builtInDataList = JsonConvert.DeserializeObject<List<LottoResultData>>(csvToJSON);
-
-            Control.builtInData = new();
-            for (int i = 0; i < builtInDataList.Count; i++)
-            {
-                if (Control.builtInData.ContainsKey(builtInDataList[i].code) == false)
-                {
-                    Control.builtInData.Add(builtInDataList[i].code, new LottoResultData()
-                    {
-                        code = builtInDataList[i].code,
-                        num1 = builtInDataList[i].num1,
-                        num2 = builtInDataList[i].num2,
-                        num3 = builtInDataList[i].num3,
-                        num4 = builtInDataList[i].num4,
-                        num5 = builtInDataList[i].num5,
-                        num6 = builtInDataList[i].num6,
-                        bonus = builtInDataList[i].bonus,
-                    });
-                }
-            }
-
-#if CHECK_LOTTO_NUMBERS
-            string originDataJSON = Resources.Load<TextAsset>("BuiltInAsset/LottoOriginResultData").text.CsvToJson(new CSVParser.Info[]
-            {
-                new CSVParser.Info("code", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num1", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num2", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num3", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num4", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num5", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("num6", CSVParser.Info.TYPE.Plain),
-                new CSVParser.Info("bonus", CSVParser.Info.TYPE.Plain),
-            }, true, 1);
-
-            List<LottoResultData> originDataList = JsonConvert.DeserializeObject<List<LottoResultData>>(originDataJSON);
-            Dictionary<int, LottoResultData> originDataDic = new();
-
-            for (int i = 0; i < originDataList.Count; i++)
-            {
-                if (originDataDic.ContainsKey(originDataList[i].code) == false)
-                {
-                    originDataDic.Add(originDataList[i].code, new LottoResultData()
-                    {
-                        code = originDataList[i].code,
-                        num1 = originDataList[i].num1,
-                        num2 = originDataList[i].num2,
-                        num3 = originDataList[i].num3,
-                        num4 = originDataList[i].num4,
-                        num5 = originDataList[i].num5,
-                        num6 = originDataList[i].num6,
-                        bonus = originDataList[i].bonus,
-                    });
-                }
-            }
-
-            Dictionary<int, LottoResultData>.Enumerator enumerator1 = originDataDic.GetEnumerator();
-            while (enumerator1.MoveNext())
-            {
-                int code = enumerator1.Current.Key;
-                if (Control.builtInData.ContainsKey(code) == false)
-                {
-                    DebugEx.LogColor(string.Format("[LOTTO CHECK] Code : {0}에 대한 빌트인 정보가 없습니다.", code), "red");
-                    return;
-                }
-
-                LottoResultData originData = enumerator1.Current.Value;
-                LottoResultData checkData = Control.builtInData[code];
-
-                int[] numArr = new int[] { originData.num1, originData.num2, originData.num3, originData.num4, originData.num5, originData.num6 };
-                for (int i = 0; i < numArr.Length; i++)
-                {
-                    int num = numArr[i];
-                    bool numCheck = checkData.num1 == num || checkData.num2 == num || checkData.num3 == num || checkData.num4 == num || checkData.num5 == num || checkData.num6 == num;
-                    if (numCheck == false)
-                    {
-                        DebugEx.LogColor(string.Format("[LOTTO CHECK] Code {0}에서 {1}가 없습니다.", code, num), "red");
-                        return;
-                    }
-                }
-
-                if (originData.bonus != checkData.bonus)
-                {
-                    DebugEx.LogColor(string.Format("[LOTTO CHECK] Code {0}의 보너스 번호가 {1}가 아닙니다.", code, originData.bonus), "red");
-                    return;
-                }
-            }
-#endif  // CHECK_LOTTO_NUMBERS
-
-            // 추첨 순서 별 번호 나온 횟수를 0으로 초기화
+            Control.assetData = new();
             Control.lottoNumberMap = new();
-            Control.lottoNumberMap.Add(1, Enumerable.Repeat(0, 45).ToList());
-            Control.lottoNumberMap.Add(2, Enumerable.Repeat(0, 45).ToList());
-            Control.lottoNumberMap.Add(3, Enumerable.Repeat(0, 45).ToList());
-            Control.lottoNumberMap.Add(4, Enumerable.Repeat(0, 45).ToList());
-            Control.lottoNumberMap.Add(5, Enumerable.Repeat(0, 45).ToList());
-            Control.lottoNumberMap.Add(6, Enumerable.Repeat(0, 45).ToList());
-            Control.lottoNumberMap.Add(7, Enumerable.Repeat(0, 45).ToList());
-
-            Dictionary<int, LottoResultData>.Enumerator enumerator2 = Control.builtInData.GetEnumerator();
-            while (enumerator2.MoveNext())
-            {
-                int code = enumerator2.Current.Key;
-                LottoResultData data = enumerator2.Current.Value;
-
-                Control.lottoNumberMap[1][data.num1 - 1]++;
-                Control.lottoNumberMap[2][data.num2 - 1]++;
-                Control.lottoNumberMap[3][data.num3 - 1]++;
-                Control.lottoNumberMap[4][data.num4 - 1]++;
-                Control.lottoNumberMap[5][data.num5 - 1]++;
-                Control.lottoNumberMap[6][data.num6 - 1]++;
-                Control.lottoNumberMap[7][data.bonus - 1]++;
-            }
         }
 
         public static IEnumerator LoadAsync()
         {
-            // TODO[jbg] : 로딩 과정 구현
+            Control.LoadingDone = false;
+
+            // 로딩 과정 시작
+            SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME, Control.START_CELL, Control.END_CELL), (spreadSheet) =>
+            {
+                Dictionary<int, List<GSTU_Cell>>.Enumerator enumerator = spreadSheet.rows.primaryDictionary.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    int rowNum = enumerator.Current.Key;
+                    if (rowNum == 1)        // 1번 행은 '열의 제목' 행이기 때문에 생략
+                        continue;
+
+                    List<GSTU_Cell> cellList = enumerator.Current.Value;        // code, num1, num2, num3, num4, num5, num6, bonus 순으로 정렬됨
+
+                    bool codeIsCorrect = int.TryParse(cellList[0].value, out int code);
+                    if (codeIsCorrect == false)
+                    {
+                        DebugEx.LogColor(string.Format("[LOTTO CHECK] {0}번째 행의 Code 값 int.Parse()를 실패했습니다.", rowNum), "red");
+                        continue;
+                    }
+
+                    if (cellList.Count != 8)
+                    {
+                        DebugEx.LogColor(string.Format("[LOTTO CHECK] Code {0}의 열 갯수가 맞지 않습니다.", code), "red");
+                        continue;
+                    }
+
+                    bool numberCheckFail = false;
+                    for (int i = 0; i < cellList.Count; i++)
+                    {
+                        GSTU_Cell cellInfo = cellList[i];
+
+                        bool isNum = int.TryParse(cellInfo.value, out int num);
+                        if (isNum == false)
+                        {
+                            numberCheckFail = true;
+
+                            DebugEx.LogColor(string.Format("[LOTTO CHECK] Code {0}의 번호들 중에서 숫자가 아닌 값이 있습니다. 실제값 : {1}", code, cellInfo.value), "red");
+                            continue;
+                        }
+                    }
+
+                    if (numberCheckFail)
+                        continue;
+
+                    if (Control.assetData.ContainsKey(code) == false)
+                    {
+                        Control.assetData.Add(code, new LottoResultData()
+                        {
+                            code = code,
+                            num1 = int.Parse(cellList[1].value),
+                            num2 = int.Parse(cellList[2].value),
+                            num3 = int.Parse(cellList[3].value),
+                            num4 = int.Parse(cellList[4].value),
+                            num5 = int.Parse(cellList[5].value),
+                            num6 = int.Parse(cellList[6].value),
+                            bonus = int.Parse(cellList[7].value),
+                        });
+                    }
+                }
+
+                // 추첨 순서 별 번호 나온 횟수를 0으로 초기화
+                Control.lottoNumberMap.Add(1, Enumerable.Repeat(0, 45).ToList());
+                Control.lottoNumberMap.Add(2, Enumerable.Repeat(0, 45).ToList());
+                Control.lottoNumberMap.Add(3, Enumerable.Repeat(0, 45).ToList());
+                Control.lottoNumberMap.Add(4, Enumerable.Repeat(0, 45).ToList());
+                Control.lottoNumberMap.Add(5, Enumerable.Repeat(0, 45).ToList());
+                Control.lottoNumberMap.Add(6, Enumerable.Repeat(0, 45).ToList());
+                Control.lottoNumberMap.Add(7, Enumerable.Repeat(0, 45).ToList());
+
+                Dictionary<int, LottoResultData>.Enumerator enumerator2 = Control.assetData.GetEnumerator();
+                while (enumerator2.MoveNext())
+                {
+                    int code = enumerator2.Current.Key;
+                    LottoResultData data = enumerator2.Current.Value;
+
+                    Control.lottoNumberMap[1][data.num1 - 1]++;
+                    Control.lottoNumberMap[2][data.num2 - 1]++;
+                    Control.lottoNumberMap[3][data.num3 - 1]++;
+                    Control.lottoNumberMap[4][data.num4 - 1]++;
+                    Control.lottoNumberMap[5][data.num5 - 1]++;
+                    Control.lottoNumberMap[6][data.num6 - 1]++;
+                    Control.lottoNumberMap[7][data.bonus - 1]++;
+                }
+
+                Control.LoadingDone = true;
+            });
+
+            while (Control.LoadingDone == false)
+                yield return null;
 
             yield break;
         }
 
-        public static int RecentPeriod { get { return Control.builtInData.Count; } }        // 가장 최근 진행한 회차
+        public static void Close()
+        {
+            if (Control.IsOpened)
+            {
+                Control.IsOpened = false;
+
+                if (Control.assetData != null)
+                    Control.assetData.Clear();
+                Control.assetData = null;
+
+                if (Control.lottoNumberMap != null)
+                    Control.lottoNumberMap.Clear();
+                Control.lottoNumberMap = null;
+
+                SystemManager.RemoveOpenList(CLASSNAME);
+            }
+        }
 
         public static List<int> GetLottoNumbers(int choiceNum)
         {
@@ -178,24 +162,6 @@ namespace com.jbg.asset.control
             }
 
             return Control.lottoNumberMap[choiceNum].ToList();
-        }
-
-        public static void Close()
-        {
-            if (Control.IsOpened)
-            {
-                Control.IsOpened = false;
-
-                if (Control.builtInData != null)
-                    Control.builtInData.Clear();
-                Control.builtInData = null;
-
-                if (Control.lottoNumberMap != null)
-                    Control.lottoNumberMap.Clear();
-                Control.lottoNumberMap = null;
-
-                SystemManager.RemoveOpenList(CLASSNAME);
-            }
         }
     }
 }
