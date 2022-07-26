@@ -1,5 +1,6 @@
 # Lotto-Generator
 Lotto 번호 생성기
+
 회차 별 당첨 번호가 나온 횟수를 종합하여 번호를 선택할 수 있습니다.
 
 ## Unity Version
