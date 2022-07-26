@@ -53,7 +53,11 @@ namespace GoogleSheetsToUnity
             sb.Append("/" + search.sheetId);
             sb.Append("/values");
             sb.Append("/" + search.worksheetName + "!" + search.startCell + ":" + search.endCell);
+#if CODE_EDIT_JBG
+            sb.Append("?access_token=" + GDR.access_token);
+#else
             sb.Append("?access_token=" + Config.gdr.access_token);
+#endif  // CODE_EDIT_JBG
 
             UnityWebRequest request = UnityWebRequest.Get(sb.ToString());
 
@@ -120,7 +124,11 @@ namespace GoogleSheetsToUnity
                     StringBuilder sb = new StringBuilder();
                     sb.Append("https://sheets.googleapis.com/v4/spreadsheets");
                     sb.Append("/" + search.sheetId);
+#if CODE_EDIT_JBG
+                    sb.Append("?access_token=" + GDR.access_token);
+#else
                     sb.Append("?access_token=" + Config.gdr.access_token);
+#endif  // CODE_EDIT_JBG
 
                     UnityWebRequest request2 = UnityWebRequest.Get(sb.ToString());
 
@@ -163,7 +171,11 @@ namespace GoogleSheetsToUnity
             sb.Append("/values");
             sb.Append("/" + search.worksheetName + "!" + search.startCell + ":" + search.endCell);
             sb.Append("?valueInputOption=USER_ENTERED");
+#if CODE_EDIT_JBG
+            sb.Append("&access_token=" + GDR.access_token);
+#else
             sb.Append("&access_token=" + Config.gdr.access_token);
+#endif  // CODE_EDIT_JBG
 
             string json = JSON.Dump(inputData, EncodeOptions.NoTypeHints);
             byte[] bodyRaw = new UTF8Encoding().GetBytes(json);
@@ -218,7 +230,11 @@ namespace GoogleSheetsToUnity
             sb.Append("https://sheets.googleapis.com/v4/spreadsheets");
             sb.Append("/" + search.sheetId);
             sb.Append("/values:batchUpdate");
+#if CODE_EDIT_JBG
+            sb.Append("?access_token=" + GDR.access_token);
+#else
             sb.Append("?access_token=" + Config.gdr.access_token);
+#endif  // CODE_EDIT_JBG
 
 
             string json = JSON.Dump(requestData, EncodeOptions.NoTypeHints);
@@ -278,7 +294,11 @@ namespace GoogleSheetsToUnity
             sb.Append("/" + search.worksheetName + "!" + search.startCell);
             sb.Append(":append");
             sb.Append("?valueInputOption=USER_ENTERED");
+#if CODE_EDIT_JBG
+            sb.Append("&access_token=" + GDR.access_token);
+#else
             sb.Append("&access_token=" + Config.gdr.access_token);
+#endif  // CODE_EDIT_JBG
 
             string json = JSON.Dump(inputData, EncodeOptions.NoTypeHints);
 
