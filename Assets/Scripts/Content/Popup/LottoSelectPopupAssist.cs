@@ -23,6 +23,7 @@ namespace com.jbg.content.popup
         private List<int> currentNumbers;
         private List<int> selectedIndex;
         private bool highestMode;
+        private bool middleMode;
         private int numberRange;
 
         private const int MAX_RANGE = 10;
@@ -56,14 +57,16 @@ namespace com.jbg.content.popup
             this.selectedIndex = new();
 
             this.highestMode = false;
+            this.middleMode = false;
             this.numberRange = 0;
 
             LottoSelectPopup.Params p = new();
-            p.title = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT);
+            p.title = string.Format(LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT), LottoResultControl.RecentPeriod + 1);
             p.countTxt = new();
             for (int i = 0; i < this.currentNumbers.Count; i++)
                 p.countTxt.Add(this.currentNumbers[i].ToString());
             p.highestToggleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_SELECT_POPUP_TOGGLE_TEXT);
+            p.middleToggleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_SELECT_POPUP_TOGGLE_TEXT_2);
             p.btnOkText = LocaleControl.GetString(LocaleCodes.BTN_OK);
 
             PopupAssist.OpenPopup("Popup_LottoSelect", p, this.ResultCallback, this.LoadedCallback);
@@ -72,6 +75,7 @@ namespace com.jbg.content.popup
         private void ResultCallback(Popup popup)
         {
             this.popupView.RemoveEvent(LottoSelectPopup.Event.HighestNumOn);
+            this.popupView.RemoveEvent(LottoSelectPopup.Event.MiddleNumOn);
             this.popupView.RemoveEvent(LottoSelectPopup.Event.NumMinus);
             this.popupView.RemoveEvent(LottoSelectPopup.Event.NumPlus);
 
@@ -92,6 +96,7 @@ namespace com.jbg.content.popup
             this.popupView = (LottoSelectPopup)popup;
 
             this.popupView.BindEvent(LottoSelectPopup.Event.HighestNumOn, this.OnClickHighestNumOn);
+            this.popupView.BindEvent(LottoSelectPopup.Event.MiddleNumOn, this.OnClickMiddleNumOn);
             this.popupView.BindEvent(LottoSelectPopup.Event.NumMinus, this.OnClickNumMinus);
             this.popupView.BindEvent(LottoSelectPopup.Event.NumPlus, this.OnClickNumPlus);
 
@@ -101,11 +106,17 @@ namespace com.jbg.content.popup
         private void UpdateSelect()
         {
             // 최소값 혹은 최대값 찾기
+            int maxNum = Mathf.Max(this.currentNumbers.ToArray());
+            int minNum = Mathf.Min(this.currentNumbers.ToArray());
+            int middleNum = minNum + (int)((maxNum - minNum) * 0.5f);
+
             int pinPoint;
             if (this.highestMode)
-                pinPoint = Mathf.Max(this.currentNumbers.ToArray());
+                pinPoint = maxNum;
+            else if (this.middleMode)
+                pinPoint = middleNum;
             else
-                pinPoint = Mathf.Min(this.currentNumbers.ToArray());
+                pinPoint = minNum;
 
             // 숫자 범위에 따른 갯수 목록 나열
             this.selectedIndex.Clear();
@@ -116,6 +127,22 @@ namespace com.jbg.content.popup
                 {
                     if (pinPoint - this.numberRange <= num && num <= pinPoint)
                         this.selectedIndex.Add(i);
+                }
+                else if (this.middleMode)
+                {
+                    bool isEven = this.numberRange % 2 == 0;
+                    if (isEven)
+                    {
+                        int value = (int)(this.numberRange * 0.5f);
+                        if (pinPoint - value <= num && num <= pinPoint + value)
+                            this.selectedIndex.Add(i);
+                    }
+                    else
+                    {
+                        int value = (int)((this.numberRange - 1) * 0.5f);
+                        if (pinPoint - value <= num && num <= pinPoint + value)
+                            this.selectedIndex.Add(i);
+                    }
                 }
                 else
                 {
@@ -141,6 +168,22 @@ namespace com.jbg.content.popup
 
             DebugEx.Log("LOTTO_SELECT_POPUP_ASSIST Highest Mode is " + isOn.ToString());
             this.highestMode = isOn;
+            this.UpdateSelect();
+        }
+
+        private void OnClickMiddleNumOn(int eventNum, object obj)
+        {
+            SoundManager.Inst.Play(SoundManager.SOUND_YES);
+
+            bool parse = bool.TryParse(obj.ToString(), out bool isOn);
+            if (parse == false)
+            {
+                DebugEx.LogColor("LOTTO_SELECT_POPUP_ASSIST PARSE ERROR", "red");
+                return;
+            }
+
+            DebugEx.Log("LOTTO_SELECT_POPUP_ASSIST Highest Mode is " + isOn.ToString());
+            this.middleMode = isOn;
             this.UpdateSelect();
         }
 
