@@ -32,7 +32,11 @@ namespace GoogleSheetsToUnity
             }
             _onComplete = null;
 
+#if CODE_EDIT_JBG
+            string serverUrl = string.Format("http://127.0.0.1:{0}", GSTU_Config.GetPort());
+#else
             string serverUrl = string.Format("http://127.0.0.1:{0}", SpreadsheetManager.Config.PORT);
+#endif  // CODE_EDIT_JBG
 
             _httpListener = new HttpListener();
             _httpListener.Prefixes.Add(serverUrl + "/");
@@ -42,7 +46,11 @@ namespace GoogleSheetsToUnity
             _onComplete += GetAuthComplete;
 
             string request = "https://accounts.google.com/o/oauth2/v2/auth?";
+#if CODE_EDIT_JBG
+            request += "client_id=" + Uri.EscapeDataString(GSTU_Config.GetClientID()) + "&";
+#else
             request += "client_id=" + Uri.EscapeDataString(SpreadsheetManager.Config.CLIENT_ID) + "&";
+#endif  // CODE_EDIT_JBG
             request += "redirect_uri=" + Uri.EscapeDataString(serverUrl) + "&";
             request += "response_type=" + "code" + "&";
             request += "scope=" + Uri.EscapeDataString("https://www.googleapis.com/auth/spreadsheets") + "&";
@@ -55,15 +63,24 @@ namespace GoogleSheetsToUnity
 
         static void GetAuthComplete(string authToken)
         {
+#if CODE_EDIT_JBG
+            string serverUrl = string.Format("http://127.0.0.1:{0}", GSTU_Config.GetPort());
+#else
             string serverUrl = string.Format("http://127.0.0.1:{0}", SpreadsheetManager.Config.PORT);
+#endif  // CODE_EDIT_JBG
 
             Debug.Log(authToken);
             Debug.Log("Auth Token = " + authToken);
 
             WWWForm f = new WWWForm();
             f.AddField("code", authToken);
+#if CODE_EDIT_JBG
+            f.AddField("client_id", GSTU_Config.GetClientID());
+            f.AddField("client_secret", GSTU_Config.GetClientSecret());
+#else   // CODE_EDIT_JBG
             f.AddField("client_id", SpreadsheetManager.Config.CLIENT_ID);
             f.AddField("client_secret", SpreadsheetManager.Config.CLIENT_SECRET);
+#endif  // CODE_EDIT_JBG
             f.AddField("redirect_uri", serverUrl);
             f.AddField("grant_type", "authorization_code");
             f.AddField("scope", "");
@@ -77,10 +94,15 @@ namespace GoogleSheetsToUnity
             {
                 yield return request.SendWebRequest();
 
+#if CODE_EDIT_JBG
+                SpreadsheetManager.GDRData = request.downloadHandler.text;
+#else
                 SpreadsheetManager.Config.gdr = JsonUtility.FromJson<GoogleDataResponse>(request.downloadHandler.text);
                 SpreadsheetManager.Config.gdr.nextRefreshTime = DateTime.Now.AddSeconds(SpreadsheetManager.Config.gdr.expires_in);
                 EditorUtility.SetDirty(SpreadsheetManager.Config);
+
                 AssetDatabase.SaveAssets();
+#endif  // CODE_EDIT_JBG
             }
         }
 
@@ -178,14 +200,24 @@ namespace GoogleSheetsToUnity
         /// <returns></returns>
         public static IEnumerator CheckForRefreshOfToken()
         {
+#if CODE_EDIT_JBG
+            if (DateTime.Now > SpreadsheetManager.GDR.nextRefreshTime)
+#else
             if (DateTime.Now > SpreadsheetManager.Config.gdr.nextRefreshTime)
+#endif  // CODE_EDIT_JBG
             {
                 Debug.Log("Refreshing Token");
 
                 WWWForm f = new WWWForm();
+#if CODE_EDIT_JBG
+                f.AddField("client_id", GSTU_Config.GetClientID());
+                f.AddField("client_secret", GSTU_Config.GetClientSecret());
+                f.AddField("refresh_token", SpreadsheetManager.GDR.refresh_token);
+#else   // CODE_EDIT_JBG
                 f.AddField("client_id", SpreadsheetManager.Config.CLIENT_ID);
                 f.AddField("client_secret", SpreadsheetManager.Config.CLIENT_SECRET);
                 f.AddField("refresh_token", SpreadsheetManager.Config.gdr.refresh_token);
+#endif  // CODE_EDIT_JBG
                 f.AddField("grant_type", "refresh_token");
                 f.AddField("scope", "");
 
@@ -193,6 +225,9 @@ namespace GoogleSheetsToUnity
                 {
                     yield return request.SendWebRequest();
 
+#if CODE_EDIT_JBG
+                    SpreadsheetManager.GDRData = request.downloadHandler.text;
+#else   // CODE_EDIT_JBG
                     GoogleDataResponse newGdr = JsonUtility.FromJson<GoogleDataResponse>(request.downloadHandler.text);
                     SpreadsheetManager.Config.gdr.access_token = newGdr.access_token;
                     SpreadsheetManager.Config.gdr.nextRefreshTime = DateTime.Now.AddSeconds(newGdr.expires_in);
@@ -201,6 +236,7 @@ namespace GoogleSheetsToUnity
                     EditorUtility.SetDirty(SpreadsheetManager.Config);
                     AssetDatabase.SaveAssets();
 #endif
+#endif  // CODE_EDIT_JBG
                 }
             }
         }

@@ -1,24 +1,34 @@
-﻿using UnityEngine;
+﻿#if CODE_EDIT_JBG
+#else
+using UnityEngine;
 using System.Collections;
+#endif  // CODE_EDIT_JBG
 using System;
 
 namespace GoogleSheetsToUnity
 {
-    public class GoogleSheetsToUnityConfig : ScriptableObject
-  {
-    public string CLIENT_ID = "";
-    public string CLIENT_SECRET = "";
-    public string ACCESS_TOKEN = "";
+#if CODE_EDIT_JBG
+    public class GoogleSheetsToUnityConfig
+    {
 
-    [HideInInspector]
-    public string REFRESH_TOKEN;
-
-    public string API_Key = "";
-
-    public int PORT;
-
-    public GoogleDataResponse gdr;
     }
+#else   // CODE_EDIT_JBG
+    public class GoogleSheetsToUnityConfig : ScriptableObject
+    {
+        public string CLIENT_ID = "";
+        public string CLIENT_SECRET = "";
+        public string ACCESS_TOKEN = "";
+
+        [HideInInspector]
+        public string REFRESH_TOKEN;
+
+        public string API_Key = "";
+
+        public int PORT;
+
+        public GoogleDataResponse gdr;
+    }
+#endif  // CODE_EDIT_JBG
 
     [System.Serializable]
     public class GoogleDataResponse

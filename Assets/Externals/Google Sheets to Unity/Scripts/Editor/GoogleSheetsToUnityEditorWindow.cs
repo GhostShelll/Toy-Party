@@ -19,10 +19,13 @@ namespace GoogleSheetsToUnity.Editor
         const float DarkGray = 0.4f;
         const float LightGray = 0.9f;
 
+#if CODE_EDIT_JBG
+#else
         GoogleSheetsToUnityConfig config;
         private bool showSecret = false;
 
         int tabID = 0;
+#endif  // CODE_EDIT_JBG
 
 #if GSTU_Legacy
         class KnownData
@@ -51,7 +54,10 @@ namespace GoogleSheetsToUnity.Editor
             GoogleSheetsToUnityEditorWindow win = EditorWindow.GetWindow<GoogleSheetsToUnityEditorWindow>("Google Sheets To Unity");
             ServicePointManager.ServerCertificateValidationCallback = Validator;
 
+#if CODE_EDIT_JBG
+#else
             win.Init();
+#endif  // CODE_EDIT_JBG
         }
 
         public static bool Validator(object in_sender, X509Certificate in_certificate, X509Chain in_chain, SslPolicyErrors in_sslPolicyErrors)
@@ -59,14 +65,23 @@ namespace GoogleSheetsToUnity.Editor
             return true;
         }
 
+#if CODE_EDIT_JBG
+#else
         public void Init()
         {
             config = (GoogleSheetsToUnityConfig)Resources.Load("GSTU_Config");
         }
+#endif  // CODE_EDIT_JBG
 
         void OnGUI()
         {
-            tabID = GUILayout.Toolbar(tabID, new string[] {"Private", "Private (Legacy)", "Public"});
+#if CODE_EDIT_JBG
+            if (GUILayout.Button("Build Connection"))
+            {
+                GoogleAuthrisationHelper.BuildHttpListener();
+            }
+#else   // CODE_EDIT_JBG
+            tabID = GUILayout.Toolbar(tabID, new string[] { "Private", "Private (Legacy)", "Public"});
 
             if (config == null)
             {
@@ -162,7 +177,7 @@ namespace GoogleSheetsToUnity.Editor
                         }
 #else
                         GUILayout.Label("This is the legacy version of GSTU and will be removed at a future date, if you wish to use it please press the button below");
-                        if(GUILayout.Button("Use Legacy Version"))
+                        if (GUILayout.Button("Use Legacy Version"))
                         {
                             BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
                             string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
@@ -181,6 +196,7 @@ namespace GoogleSheetsToUnity.Editor
 
 
             EditorUtility.SetDirty(config);
+#endif  // CODE_EDIT_JBG
         }
 #if GSTU_Legacy
         void DrawPreview()
