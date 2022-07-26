@@ -13,6 +13,8 @@ namespace GoogleSheetsToUnity
 {
     public class GoogleAuthrisationHelper : MonoBehaviour
     {
+#if CODE_EDIT_JBG
+#if UNITY_EDITOR
         static string _authToken = "";
 
         static HttpListener _httpListener;
@@ -21,6 +23,17 @@ namespace GoogleSheetsToUnity
         private static object _notifyAuthTokenLock = new object();
         private static bool _shouldNotifyAuthTokenReceived = false;
         private static Action<string> _onComplete;
+#endif  // UNITY_EDITOR
+#else   // CODE_EDIT_JBG
+        static string _authToken = "";
+
+        static HttpListener _httpListener;
+        static string _htmlResponseContent = "<h1>Google Sheets and Unity are now linked, you may close this window</h1>"; //message shown after connection has been set up
+
+        private static object _notifyAuthTokenLock = new object();
+        private static bool _shouldNotifyAuthTokenReceived = false;
+        private static Action<string> _onComplete;
+#endif  // CODE_EDIT_JBG
 
 #if UNITY_EDITOR
         public static void BuildHttpListener()
