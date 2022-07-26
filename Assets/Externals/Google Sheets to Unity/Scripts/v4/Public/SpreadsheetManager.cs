@@ -27,6 +27,9 @@ namespace GoogleSheetsToUnity
             set
             {
                 PlayerPrefs.SetString("GDRData", value);
+
+                SpreadsheetManager._gdr = JsonUtility.FromJson<GoogleDataResponse>(value);
+                SpreadsheetManager._gdr.nextRefreshTime = System.DateTime.Now.AddSeconds(SpreadsheetManager._gdr.expires_in);
             }
         }
 
