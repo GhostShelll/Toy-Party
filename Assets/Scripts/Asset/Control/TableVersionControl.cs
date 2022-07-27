@@ -19,6 +19,7 @@ namespace com.jbg.asset.control
         public static bool CheckDone { get; private set; }
 
         private static Dictionary<string, TableVersionData> assetData = new();
+        private static UnityWebRequest request = new();
         private static List<string> needDownloadAsset = new();
 
         private const string CLASSNAME = "TableVersionControl";
@@ -33,8 +34,12 @@ namespace com.jbg.asset.control
 
             Control.CheckDone = false;
 
-            Control.assetData = new();
-            Control.needDownloadAsset = new();
+            if (Control.assetData == null)
+                Control.assetData = new();
+            Control.assetData.Clear();
+            if (Control.needDownloadAsset == null)
+                Control.needDownloadAsset = new();
+            Control.needDownloadAsset.Clear();
 
             string localPath = AssetManager.PATH_ASSET_TABLE_VERSION_DATA;
             if (File.Exists(localPath))
@@ -74,6 +79,9 @@ namespace com.jbg.asset.control
                     Control.assetData.Clear();
                 Control.assetData = null;
 
+                if (Control.request != null)
+                    Control.request.Dispose();
+
                 if (Control.needDownloadAsset != null)
                     Control.needDownloadAsset.Clear();
                 Control.needDownloadAsset = null;
@@ -104,8 +112,8 @@ namespace com.jbg.asset.control
             }
 
             // 다운로드 시작
-            UnityWebRequest request = UnityWebRequest.Get(downloadPath);
-            yield return request.SendWebRequest();
+            Control.request = UnityWebRequest.Get(downloadPath);
+            yield return Control.request.SendWebRequest();
 
             // 다운로드 완료
             if (request.result != UnityWebRequest.Result.Success)
@@ -185,6 +193,19 @@ namespace com.jbg.asset.control
             Control.CheckDone = true;
 
             yield break;
+        }
+
+        public static float GetRequestProgress()
+        {
+            if (Control.request != null)
+                return Control.request.downloadProgress;
+
+            return 1f;
+        }
+
+        public static bool NeedDownload(string assetName)
+        {
+            return Control.needDownloadAsset.Contains(assetName);
         }
     }
 }

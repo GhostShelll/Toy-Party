@@ -71,7 +71,7 @@ namespace com.jbg.content.scene
                 else
                 {
                     // 에셋 체크 중
-                    this.sceneView.UpdateCheckAsset();
+                    this.sceneView.UpdateCheckAsset(TableVersionControl.GetRequestProgress());
                 }
             });
         }
@@ -81,11 +81,11 @@ namespace com.jbg.content.scene
             this.SetState((int)STATE.DownloadAsset);
 
             // 에셋 로드 시작
-            Coroutine task = CoroutineManager.AddTask(AssetManager.LoadAsync());
+            Coroutine task = CoroutineManager.AddTask(AssetManager.DownloadAsset());
 
             this.AddUpdateFunc(() =>
             {
-                if (AssetManager.LoadingDone)
+                if (AssetManager.DownloadDone)
                 {
                     // 에셋 로드 완료함
                     if (task != null)

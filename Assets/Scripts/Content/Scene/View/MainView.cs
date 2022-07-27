@@ -66,11 +66,11 @@ namespace com.jbg.content.scene.view
             this.refreshBtn.Interactable = true;
         }
 
-        public void UpdateCheckAsset()
+        public void UpdateCheckAsset(float progress)
         {
             Params p = this.paramBuffer;
 
-            this.progress.fillAmount = 1f;
+            this.progress.fillAmount = progress;
 
             string checkAssetTxt = p.checkAssetTxt;
             for (int i = 0; i < this.dotCount; i++)
