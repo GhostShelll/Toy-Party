@@ -30,6 +30,7 @@ namespace com.jbg.asset
             Manager.CurrentProgress = 0f;
 
             // 각종 에셋 오픈
+            TableVersionControl.Open();
             LocaleControl.Open();
             LottoResultControl.Open();
         }
@@ -78,6 +79,7 @@ namespace com.jbg.asset
                 SystemManager.RemoveOpenList(CLASSNAME);
 
                 // 각종 에셋 클로즈
+                TableVersionControl.Close();
                 LocaleControl.Close();
                 LottoResultControl.Close();
             }
