@@ -18,6 +18,9 @@ namespace com.jbg.asset
 
         private const string CLASSNAME = "AssetManager";
 
+        public static readonly string PATH_ASSET = UnityEngine.Application.persistentDataPath + "/Asset/";
+        public static readonly string PATH_ASSET_TABLE_VERSION_DATA = Manager.PATH_ASSET + TableVersionControl.TABLENAME + ".csv";
+
         public static void Open()
         {
             Manager.Close();

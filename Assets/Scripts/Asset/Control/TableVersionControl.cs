@@ -1,8 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 
-using com.jbg.core;
+using UnityEngine.Networking;
+using Newtonsoft.Json;
+
+using com.jbg.asset.data;
+using com.jbg.content.popup;
 using com.jbg.core.manager;
 
 namespace com.jbg.asset.control
@@ -12,7 +16,10 @@ namespace com.jbg.asset.control
     public class TableVersionControl
     {
         public static bool IsOpened { get; private set; }
-        public static bool LoadingDone { get; private set; }
+        public static bool CheckDone { get; private set; }
+
+        private static Dictionary<string, TableVersionData> assetData = new();
+        private static List<string> needDownloadAsset = new();
 
         private const string CLASSNAME = "TableVersionControl";
         public const string TABLENAME = "TableVersionData";
@@ -24,21 +31,37 @@ namespace com.jbg.asset.control
 
             SystemManager.AddOpenList(CLASSNAME);
 
-            Control.LoadingDone = false;
-        }
+            Control.CheckDone = false;
 
-        public static IEnumerator LoadAsync()
-        {
-            Control.LoadingDone = false;
+            Control.assetData = new();
+            Control.needDownloadAsset = new();
 
-            // TODO[jbg] : 로딩 과정 시작
+            string localPath = AssetManager.PATH_ASSET_TABLE_VERSION_DATA;
+            if (File.Exists(localPath))
+            {
+                string csvData = File.ReadAllText(localPath, System.Text.Encoding.UTF8);
+                if (string.IsNullOrEmpty(csvData) == false)
+                {
+                    string jsonData = csvData.CsvToJson(new CSVParser.Info[]
+                    {
+                        new CSVParser.Info("name", CSVParser.Info.TYPE.String),
+                        new CSVParser.Info("version", CSVParser.Info.TYPE.Plain),
+                    }, true, 1);
 
-            Control.LoadingDone = true;
-
-            while (Control.LoadingDone == false)
-                yield return null;
-
-            yield break;
+                    List<TableVersionData> dataList = JsonConvert.DeserializeObject<List<TableVersionData>>(jsonData);
+                    for (int i = 0; i < dataList.Count; i++)
+                    {
+                        if (Control.assetData.ContainsKey(dataList[i].name) == false)
+                        {
+                            Control.assetData.Add(dataList[i].name, new TableVersionData()
+                            {
+                                name = dataList[i].name,
+                                version = dataList[i].version,
+                            });
+                        }
+                    }
+                }
+            }
         }
 
         public static void Close()
@@ -47,8 +70,121 @@ namespace com.jbg.asset.control
             {
                 Control.IsOpened = false;
 
+                if (Control.assetData != null)
+                    Control.assetData.Clear();
+                Control.assetData = null;
+
+                if (Control.needDownloadAsset != null)
+                    Control.needDownloadAsset.Clear();
+                Control.needDownloadAsset = null;
+
                 SystemManager.RemoveOpenList(CLASSNAME);
             }
+        }
+
+        public static IEnumerator CheckAsset()
+        {
+            Control.CheckDone = false;
+
+            // 다운로드 경로 가져오기
+            string downloadPath = GoogleSheetConfig.GetDownloadPath(Control.TABLENAME);
+            if (string.IsNullOrEmpty(downloadPath))
+            {
+                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download Path is null. Check DLL File.", Control.TABLENAME);
+#if UNITY_EDITOR
+                PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, (popup) =>
+                {
+                    GameRestart.StartScene();
+                });
+#else   // UNITY_EDITOR
+                UnityEngine.Debug.LogError(message);
+                UnityEngine.Application.Quit();
+#endif  // UNITY_EDITOR
+                yield break;
+            }
+
+            // 다운로드 시작
+            UnityWebRequest request = UnityWebRequest.Get(downloadPath);
+            yield return request.SendWebRequest();
+
+            // 다운로드 완료
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download not success. Result : {1}, Error : {2}", Control.TABLENAME, request.result.ToString(), request.error);
+#if UNITY_EDITOR
+                PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, (popup) =>
+                {
+                    GameRestart.StartScene();
+                });
+#else   // UNITY_EDITOR
+                UnityEngine.Debug.LogError(message);
+                UnityEngine.Application.Quit();
+#endif  // UNITY_EDITOR
+                yield break;
+            }
+
+            // 다운로드한 파일 검사
+            string csvData = request.downloadHandler.text;
+            if (string.IsNullOrEmpty(csvData))
+            {
+                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download data not vaild.", Control.TABLENAME);
+#if UNITY_EDITOR
+                PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, (popup) =>
+                {
+                    GameRestart.StartScene();
+                });
+#else   // UNITY_EDITOR
+                UnityEngine.Debug.LogError(message);
+                UnityEngine.Application.Quit();
+#endif  // UNITY_EDITOR
+                yield break;
+            }
+
+            // 다운로드한 파일 저장
+            string localPath = AssetManager.PATH_ASSET_TABLE_VERSION_DATA;
+
+            string directoryName = Path.GetDirectoryName(localPath);
+            if (Directory.Exists(directoryName) == false)
+                Directory.CreateDirectory(directoryName);
+
+            File.WriteAllText(localPath, csvData, System.Text.Encoding.UTF8);
+
+            // 이전 정보와 비교하기
+            string jsonData = csvData.CsvToJson(new CSVParser.Info[]
+            {
+                new CSVParser.Info("name", CSVParser.Info.TYPE.String),
+                new CSVParser.Info("version", CSVParser.Info.TYPE.Plain),
+            }, true, 1);
+
+            List<TableVersionData> dataList = JsonConvert.DeserializeObject<List<TableVersionData>>(jsonData);
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                string curDataName = dataList[i].name;
+                int curDataVersion = dataList[i].version;
+
+                if (Control.assetData.ContainsKey(curDataName) == false)
+                {
+                    Control.assetData.Add(curDataName, new TableVersionData()
+                    {
+                        name = curDataName,
+                        version = curDataVersion,
+                    });
+                }
+                else
+                {
+                    TableVersionData originData = Control.assetData[curDataName];
+                    if (originData.version != curDataVersion)
+                    {
+                        originData.version = curDataVersion;
+                        if (Control.needDownloadAsset.Contains(curDataName) == false)
+                            Control.needDownloadAsset.Add(curDataName);
+                    }
+                }
+            }
+
+            Control.CheckDone = true;
+
+            yield break;
         }
     }
 }
