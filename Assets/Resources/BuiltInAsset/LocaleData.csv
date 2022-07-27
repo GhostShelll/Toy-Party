@@ -6,5 +6,7 @@ code,koKR,enUS
 1103,높은 순으로 선택하기,Select in Ascending Order
 1104,로또 번호 선택,Lotto Number Select
 1105,중간 번호부터 선택하기,Choose from the middle number
+1106,{0}회 로또 번호 선택,No. {0} Lotto Number Select
 1200,{0} 에셋 다운로드중,{0} Asset Downloading
 1201,에셋 갱신,Refresh Asset
+1202,에셋 체크중,Check Asset

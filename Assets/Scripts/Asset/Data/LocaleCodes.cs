@@ -48,5 +48,10 @@ namespace com.jbg.asset.data
         /// 에셋 갱신 버튼 문구
         /// </summary>
         public const int MAIN_SCENE_ASSET_LOADING_BTN_TEXT = 1201;
+
+        /// <summary>
+        /// 에셋 체크 문구
+        /// </summary>
+        public const int MAIN_SCENE_ASSET_CHECKING_TEXT = 1202;
     }
 }

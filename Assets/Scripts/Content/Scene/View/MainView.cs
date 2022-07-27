@@ -17,7 +17,8 @@ namespace com.jbg.content.scene.view
         public class Params
         {
             public string lottoBtnTxt;
-            public string progressTxt;
+            public string checkAssetTxt;
+            public string downloadAssetTxt;
             public string refreshBtnTxt;
         }
 
@@ -51,7 +52,7 @@ namespace com.jbg.content.scene.view
             this.refreshBtn.Text = p.refreshBtnTxt;
         }
 
-        public void SetStateAssetLoad()
+        public void SetStateCheckAsset()
         {
             this.lottoBtn.GameObject.SetActive(false);
             this.progressObj.SetActive(true);
@@ -65,28 +66,38 @@ namespace com.jbg.content.scene.view
             this.refreshBtn.Interactable = true;
         }
 
-        public void UpdateProgress(string assetName, float progress)
+        public void UpdateCheckAsset(float progress)
         {
-            if (progress == 0f || progress == 1f)
-            {
-                this.progress.fillAmount = progress;
-                this.progressTxt.text = string.Empty;
-                return;
-            }
-
             Params p = this.paramBuffer;
 
             this.progress.fillAmount = progress;
 
-            string progressTxt = string.Format(p.progressTxt, assetName);
+            string checkAssetTxt = p.checkAssetTxt;
             for (int i = 0; i < this.dotCount; i++)
-                progressTxt += '.';
+                checkAssetTxt += '.';
 
             this.dotCount++;
             if (this.dotCount > 3)
                 this.dotCount = 1;
 
-            this.progressTxt.text = progressTxt;
+            this.progressTxt.text = checkAssetTxt;
+        }
+
+        public void UpdateDownloadAsset(string assetName, float progress)
+        {
+            Params p = this.paramBuffer;
+
+            this.progress.fillAmount = progress;
+
+            string downloadAssetTxt = string.Format(p.downloadAssetTxt, assetName);
+            for (int i = 0; i < this.dotCount; i++)
+                downloadAssetTxt += '.';
+
+            this.dotCount++;
+            if (this.dotCount > 3)
+                this.dotCount = 1;
+
+            this.progressTxt.text = downloadAssetTxt;
         }
 
         public void OnClickLottoSelect()
