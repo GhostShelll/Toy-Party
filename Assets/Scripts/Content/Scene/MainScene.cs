@@ -71,7 +71,9 @@ namespace com.jbg.content.scene
                 else
                 {
                     // 에셋 체크 중
-                    this.sceneView.UpdateCheckAsset(TableVersionControl.GetRequestProgress());
+                    float currentProgress = TableVersionControl.GetRequestProgress();
+
+                    this.sceneView.UpdateCheckAsset(currentProgress);
                 }
             });
         }
