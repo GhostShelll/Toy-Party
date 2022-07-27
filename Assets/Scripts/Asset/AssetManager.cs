@@ -17,7 +17,6 @@ namespace com.jbg.asset
         public static float CurrentProgress { get; private set; }
 
         private const string CLASSNAME = "AssetManager";
-        public const string ASSOCIATED_SHEET = "1tJmnVzNu45UkLEqM_6hAP-3sPcxtFnBBknsPM-7wpJA";
 
         public static void Open()
         {
@@ -42,8 +41,8 @@ namespace com.jbg.asset
 
             // 로딩할 것들 목록 만들기
             Dictionary<string, IEnumerator> loadList = new();
-            loadList.Add(LocaleControl.ASSOCIATED_SHEET_NAME, LocaleControl.LoadAsync());
-            loadList.Add(LottoResultControl.ASSOCIATED_SHEET_NAME, LottoResultControl.LoadAsync());
+            loadList.Add(LocaleControl.TABLENAME, LocaleControl.LoadAsync());
+            loadList.Add(LottoResultControl.TABLENAME, LottoResultControl.LoadAsync());
 
             float currentCount = 0f;
             float totalCount = loadList.Count;

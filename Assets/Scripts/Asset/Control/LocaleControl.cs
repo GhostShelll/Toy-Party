@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using Newtonsoft.Json;
-using GoogleSheetsToUnity;
 
 using com.jbg.asset.data;
 using com.jbg.core;
@@ -47,9 +46,7 @@ namespace com.jbg.asset.control
         private static Dictionary<int, LocaleData> downloadedLocale = new();
 
         private const string CLASSNAME = "LocaleControl";
-        public const string ASSOCIATED_SHEET_NAME = "LocaleData";
-        private const string START_CELL = "A1";
-        private const string END_CELL = "C100";
+        public const string TABLENAME = "LocaleData";
 
         public static void Open()
         {
@@ -97,44 +94,46 @@ namespace com.jbg.asset.control
         {
             Control.LoadingDone = false;
 
-            // 로딩 과정 시작
-            SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME, Control.START_CELL, Control.END_CELL), (spreadSheet) =>
-            {
-                Dictionary<int, List<GSTU_Cell>>.Enumerator enumerator = spreadSheet.rows.primaryDictionary.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    int rowNum = enumerator.Current.Key;
-                    if (rowNum == 1)        // 1번 행은 '열의 제목' 행이기 때문에 생략
-                        continue;
+            // TODO[jbg] : 로딩 과정 시작
+            //SpreadsheetManager.Read(new GSTU_Search(AssetManager.ASSOCIATED_SHEET, Control.ASSOCIATED_SHEET_NAME, Control.START_CELL, Control.END_CELL), (spreadSheet) =>
+            //{
+            //    Dictionary<int, List<GSTU_Cell>>.Enumerator enumerator = spreadSheet.rows.primaryDictionary.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        int rowNum = enumerator.Current.Key;
+            //        if (rowNum == 1)        // 1번 행은 '열의 제목' 행이기 때문에 생략
+            //            continue;
 
-                    List<GSTU_Cell> cellList = enumerator.Current.Value;        // code, koKR, enUS 순으로 정렬됨
+            //        List<GSTU_Cell> cellList = enumerator.Current.Value;        // code, koKR, enUS 순으로 정렬됨
 
-                    bool codeIsCorrect = int.TryParse(cellList[0].value, out int code);
-                    if (codeIsCorrect == false)
-                    {
-                        DebugEx.LogColor(string.Format("[LOCALE CHECK] {0}번째 행의 Code 값 int.Parse()를 실패했습니다.", rowNum), "red");
-                        continue;
-                    }
+            //        bool codeIsCorrect = int.TryParse(cellList[0].value, out int code);
+            //        if (codeIsCorrect == false)
+            //        {
+            //            DebugEx.LogColor(string.Format("[LOCALE CHECK] {0}번째 행의 Code 값 int.Parse()를 실패했습니다.", rowNum), "red");
+            //            continue;
+            //        }
 
-                    if (cellList.Count != 3)
-                    {
-                        DebugEx.LogColor(string.Format("[LOCALE CHECK] Code {0}의 열 갯수가 맞지 않습니다.", code), "red");
-                        continue;
-                    }
+            //        if (cellList.Count != 3)
+            //        {
+            //            DebugEx.LogColor(string.Format("[LOCALE CHECK] Code {0}의 열 갯수가 맞지 않습니다.", code), "red");
+            //            continue;
+            //        }
 
-                    if (Control.downloadedLocale.ContainsKey(code) == false)
-                    {
-                        Control.downloadedLocale.Add(code, new LocaleData()
-                        {
-                            code = code,
-                            koKR = cellList[1].value,
-                            enUS = cellList[2].value,
-                        });
-                    }
-                }
+            //        if (Control.downloadedLocale.ContainsKey(code) == false)
+            //        {
+            //            Control.downloadedLocale.Add(code, new LocaleData()
+            //            {
+            //                code = code,
+            //                koKR = cellList[1].value,
+            //                enUS = cellList[2].value,
+            //            });
+            //        }
+            //    }
 
-                Control.LoadingDone = true;
-            });
+            //    Control.LoadingDone = true;
+            //});
+
+            Control.LoadingDone = true;
 
             while (Control.LoadingDone == false)
                 yield return null;
