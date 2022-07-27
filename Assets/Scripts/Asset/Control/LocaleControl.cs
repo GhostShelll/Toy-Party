@@ -44,15 +44,15 @@ namespace com.jbg.asset.control
         private static Dictionary<int, LocaleData> builtInLocale = new();
         private static Dictionary<int, LocaleData> assetData = new();
 
-        private const string CLASSNAME = "LocaleControl";
-        public const string TABLENAME = "LocaleData";
+        private const string CLASS_NAME = "LocaleControl";
+        public const string TABLE_NAME = "LocaleData";
 
         public static void Open()
         {
             Control.Close();
             Control.IsOpened = true;
 
-            SystemManager.AddOpenList(CLASSNAME);
+            SystemManager.AddOpenList(CLASS_NAME);
 
             if (Control.builtInLocale == null)
                 Control.builtInLocale = new();
@@ -112,7 +112,7 @@ namespace com.jbg.asset.control
                     Control.assetData.Clear();
                 Control.assetData = null;
 
-                SystemManager.RemoveOpenList(CLASSNAME);
+                SystemManager.RemoveOpenList(CLASS_NAME);
             }
         }
 

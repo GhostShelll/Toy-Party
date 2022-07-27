@@ -20,15 +20,15 @@ namespace com.jbg.asset.control
         private static Dictionary<int, LottoResultData> assetData = new();
         private static Dictionary<int, List<int>> lottoNumberMap = new();       // 추첨 순서 별 로또번호 등장 횟수
 
-        private const string CLASSNAME = "LottoResultControl";
-        public const string TABLENAME = "LottoResultData";
+        private const string CLASS_NAME = "LottoResultControl";
+        public const string TABLE_NAME = "LottoResultData";
 
         public static void Open()
         {
             Control.Close();
             Control.IsOpened = true;
 
-            SystemManager.AddOpenList(CLASSNAME);
+            SystemManager.AddOpenList(CLASS_NAME);
 
             if (Control.assetData == null)
                 Control.assetData = new();
@@ -59,7 +59,7 @@ namespace com.jbg.asset.control
                     Control.lottoNumberMap.Clear();
                 Control.lottoNumberMap = null;
 
-                SystemManager.RemoveOpenList(CLASSNAME);
+                SystemManager.RemoveOpenList(CLASS_NAME);
             }
         }
 

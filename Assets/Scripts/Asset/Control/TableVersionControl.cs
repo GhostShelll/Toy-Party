@@ -22,15 +22,15 @@ namespace com.jbg.asset.control
         private static UnityWebRequest request = new();
         private static List<string> needDownloadAsset = new();
 
-        private const string CLASSNAME = "TableVersionControl";
-        public const string TABLENAME = "TableVersionData";
+        private const string CLASS_NAME = "TableVersionControl";
+        public const string TABLE_NAME = "TableVersionData";
 
         public static void Open()
         {
             Control.Close();
             Control.IsOpened = true;
 
-            SystemManager.AddOpenList(CLASSNAME);
+            SystemManager.AddOpenList(CLASS_NAME);
 
             Control.CheckDone = false;
 
@@ -86,7 +86,7 @@ namespace com.jbg.asset.control
                     Control.needDownloadAsset.Clear();
                 Control.needDownloadAsset = null;
 
-                SystemManager.RemoveOpenList(CLASSNAME);
+                SystemManager.RemoveOpenList(CLASS_NAME);
             }
         }
 
@@ -95,10 +95,10 @@ namespace com.jbg.asset.control
             Control.CheckDone = false;
 
             // 다운로드 경로 가져오기
-            string downloadPath = GoogleSheetConfig.GetDownloadPath(Control.TABLENAME);
+            string downloadPath = GoogleSheetConfig.GetDownloadPath(Control.TABLE_NAME);
             if (string.IsNullOrEmpty(downloadPath))
             {
-                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download Path is null. Check DLL File.", Control.TABLENAME);
+                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download Path is null. Check DLL File.", Control.TABLE_NAME);
 #if UNITY_EDITOR
                 PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, (popup) =>
                 {
@@ -118,7 +118,7 @@ namespace com.jbg.asset.control
             // 다운로드 완료
             if (request.result != UnityWebRequest.Result.Success)
             {
-                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download not success. Result : {1}, Error : {2}", Control.TABLENAME, request.result.ToString(), request.error);
+                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download not success. Result : {1}, Error : {2}", Control.TABLE_NAME, request.result.ToString(), request.error);
 #if UNITY_EDITOR
                 PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, (popup) =>
                 {
@@ -135,7 +135,7 @@ namespace com.jbg.asset.control
             string csvData = request.downloadHandler.text;
             if (string.IsNullOrEmpty(csvData))
             {
-                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download data not vaild.", Control.TABLENAME);
+                string message = string.Format("[TABLE_VERSION_CONTROL] {0} Download data not vaild.", Control.TABLE_NAME);
 #if UNITY_EDITOR
                 PopupAssist.OpenNoticeOneBtnPopup("DEBUG ERROR", message, (popup) =>
                 {

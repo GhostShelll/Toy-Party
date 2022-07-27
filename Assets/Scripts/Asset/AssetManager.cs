@@ -24,9 +24,9 @@ namespace com.jbg.asset
         private const string CLASSNAME = "AssetManager";
 
         public static readonly string PATH_ASSET = UnityEngine.Application.persistentDataPath + "/Asset/";
-        public static readonly string PATH_ASSET_TABLE_VERSION_DATA = Manager.PATH_ASSET + TableVersionControl.TABLENAME + ".csv";
-        public static readonly string PATH_ASSET_LOCALE_DATA = Manager.PATH_ASSET + LocaleControl.TABLENAME + ".csv";
-        public static readonly string PATH_ASSET_LOTTO_RESULT_DATA = Manager.PATH_ASSET + LottoResultControl.TABLENAME + ".csv";
+        public static readonly string PATH_ASSET_TABLE_VERSION_DATA = Manager.PATH_ASSET + TableVersionControl.TABLE_NAME + ".csv";
+        public static readonly string PATH_ASSET_LOCALE_DATA = Manager.PATH_ASSET + LocaleControl.TABLE_NAME + ".csv";
+        public static readonly string PATH_ASSET_LOTTO_RESULT_DATA = Manager.PATH_ASSET + LottoResultControl.TABLE_NAME + ".csv";
 
         private struct DownloadData
         {
@@ -75,8 +75,8 @@ namespace com.jbg.asset
 
             // 로딩할 것들 목록 만들기
             List<DownloadData> downloadList = new();
-            downloadList.Add(new() { tableName = LocaleControl.TABLENAME, localPath = Manager.PATH_ASSET_LOCALE_DATA, updateDataCallback = LocaleControl.UpdateData, });
-            downloadList.Add(new() { tableName = LottoResultControl.TABLENAME, localPath = Manager.PATH_ASSET_LOTTO_RESULT_DATA, updateDataCallback = LottoResultControl.UpdateData, });
+            downloadList.Add(new() { tableName = LocaleControl.TABLE_NAME, localPath = Manager.PATH_ASSET_LOCALE_DATA, updateDataCallback = LocaleControl.UpdateData, });
+            downloadList.Add(new() { tableName = LottoResultControl.TABLE_NAME, localPath = Manager.PATH_ASSET_LOTTO_RESULT_DATA, updateDataCallback = LottoResultControl.UpdateData, });
 
             // 리스트 순회하면서 다운로드 순차 진행
             for (int i = 0; i < downloadList.Count; i++)
