@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+
+using UnityEngine.Networking;
 
 using com.jbg.asset.control;
+using com.jbg.core;
 using com.jbg.core.manager;
 
 namespace com.jbg.asset
@@ -12,14 +16,25 @@ namespace com.jbg.asset
     {
         public static bool IsOpened { get; private set; }
 
-        public static bool LoadingDone { get; private set; }
+        public static bool DownloadDone { get; private set; }
         public static string CurrentAsset { get; private set; }
-        public static float CurrentProgress { get; private set; }
+
+        private static UnityWebRequest currentRequest = new();
 
         private const string CLASSNAME = "AssetManager";
 
         public static readonly string PATH_ASSET = UnityEngine.Application.persistentDataPath + "/Asset/";
         public static readonly string PATH_ASSET_TABLE_VERSION_DATA = Manager.PATH_ASSET + TableVersionControl.TABLENAME + ".csv";
+        public static readonly string PATH_ASSET_LOCALE_DATA = Manager.PATH_ASSET + LocaleControl.TABLENAME + ".csv";
+        public static readonly string PATH_ASSET_LOTTO_RESULT_DATA = Manager.PATH_ASSET + LottoResultControl.TABLENAME + ".csv";
+
+        private struct DownloadData
+        {
+            public string tableName;
+            public string localPath;
+            public UnityWebRequest request;
+            public System.Action<string> updateDataCallback;
+        }
 
         public static void Open()
         {
@@ -28,49 +43,14 @@ namespace com.jbg.asset
 
             SystemManager.AddOpenList(CLASSNAME);
 
-            Manager.LoadingDone = false;
+            Manager.DownloadDone = false;
             Manager.CurrentAsset = string.Empty;
-            Manager.CurrentProgress = 0f;
+            Manager.currentRequest = null;
 
             // 각종 에셋 오픈
             TableVersionControl.Open();
             LocaleControl.Open();
             LottoResultControl.Open();
-        }
-
-        public static IEnumerator LoadAsync()
-        {
-            // 로딩 과정 시작
-            Manager.LoadingDone = false;
-
-            // 로딩할 것들 목록 만들기
-            Dictionary<string, IEnumerator> loadList = new();
-            loadList.Add(LocaleControl.TABLENAME, LocaleControl.LoadAsync());
-            loadList.Add(LottoResultControl.TABLENAME, LottoResultControl.LoadAsync());
-
-            float currentCount = 0f;
-            float totalCount = loadList.Count;
-
-            Dictionary<string, IEnumerator>.Enumerator enumerator = loadList.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                string assetName = enumerator.Current.Key;
-                IEnumerator task = enumerator.Current.Value;
-
-                Manager.CurrentAsset = assetName;
-                Manager.CurrentProgress = currentCount / totalCount;
-
-                yield return task;
-
-                currentCount++;
-            }
-
-            Manager.CurrentAsset = string.Empty;
-            Manager.CurrentProgress = currentCount / totalCount;
-
-            Manager.LoadingDone = true;
-
-            yield break;
         }
 
         public static void Close()
@@ -86,6 +66,96 @@ namespace com.jbg.asset
                 LocaleControl.Close();
                 LottoResultControl.Close();
             }
+        }
+
+        public static IEnumerator DownloadAsset()
+        {
+            // 로딩 과정 시작
+            Manager.DownloadDone = false;
+
+            // 로딩할 것들 목록 만들기
+            List<DownloadData> downloadList = new();
+            downloadList.Add(new() { tableName = LocaleControl.TABLENAME, localPath = Manager.PATH_ASSET_LOCALE_DATA, updateDataCallback = LocaleControl.UpdateData, });
+            downloadList.Add(new() { tableName = LottoResultControl.TABLENAME, localPath = Manager.PATH_ASSET_LOTTO_RESULT_DATA, updateDataCallback = LottoResultControl.UpdateData, });
+
+            // 리스트 순회하면서 다운로드 순차 진행
+            for (int i = 0; i < downloadList.Count; i++)
+            {
+                DownloadData downloadData = downloadList[i];
+                string tableName = downloadData.tableName;
+                string localPath = downloadData.localPath;
+
+                Manager.CurrentAsset = tableName;
+
+                // 다운로드 필요한가 검사
+                if (TableVersionControl.NeedDownload(tableName) == false && File.Exists(localPath))
+                    continue;
+
+                // 다운로드 경로 가져오기
+                string downloadPath = GoogleSheetConfig.GetDownloadPath(tableName);
+                if (string.IsNullOrEmpty(downloadPath))
+                {
+                    string message = string.Format("[ASSET_DOWNLOAD] {0} Download Path is null. Check DLL File.", tableName);
+                    DebugEx.LogColor(message, "red");
+                    continue;
+                }
+
+                // 다운로드 시작
+                downloadData.request = UnityWebRequest.Get(downloadPath);
+                Manager.currentRequest = downloadData.request;
+
+                yield return downloadData.request.SendWebRequest();
+
+                // 다운로드 완료
+                if (downloadData.request.result != UnityWebRequest.Result.Success)
+                {
+                    string message = string.Format("[ASSET_DOWNLOAD] {0} Download not success. Result : {1}, Error : {2}", tableName, downloadData.request.result.ToString(), downloadData.request.error);
+                    DebugEx.LogColor(message, "red");
+                    continue;
+                }
+
+                // 다운로드한 파일 검사
+                string csvData = downloadData.request.downloadHandler.text;
+                if (string.IsNullOrEmpty(csvData))
+                {
+                    string message = string.Format("[ASSET_DOWNLOAD] {0} Download data not vaild.", tableName);
+                    DebugEx.LogColor(message, "red");
+                    continue;
+                }
+
+                // 다운로드한 파일 저장
+                string directoryName = Path.GetDirectoryName(localPath);
+                if (Directory.Exists(directoryName) == false)
+                    Directory.CreateDirectory(directoryName);
+
+                File.WriteAllText(localPath, csvData, System.Text.Encoding.UTF8);
+
+                // 에셋 갱신하기
+                downloadData.updateDataCallback(csvData);
+            }
+
+            // 다운로드 요청 객체 정리
+            for (int i = 0; i < downloadList.Count; i++)
+            {
+                DownloadData downloadData = downloadList[i];
+
+                if (downloadData.request != null)
+                    downloadData.request.Dispose();
+            }
+
+            Manager.DownloadDone = true;
+            Manager.CurrentAsset = string.Empty;
+            Manager.currentRequest = null;
+
+            yield break;
+        }
+
+        public static float GetRequestProgress()
+        {
+            if (Manager.currentRequest != null)
+                return Manager.currentRequest.downloadProgress;
+
+            return 1f;
         }
     }
 }

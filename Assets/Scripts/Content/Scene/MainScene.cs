@@ -66,7 +66,7 @@ namespace com.jbg.content.scene
                     if (task != null)
                         CoroutineManager.RemoveTask(task);
 
-                    this.SetStateWaitDone();    // TODO[jbg]
+                    this.SetStateDownloadAsset();
                 }
                 else
                 {
@@ -97,7 +97,7 @@ namespace com.jbg.content.scene
                 {
                     // 에셋 로드중
                     string currentAsset = AssetManager.CurrentAsset;
-                    float currentProgress = AssetManager.CurrentProgress;
+                    float currentProgress = AssetManager.GetRequestProgress();
 
                     this.sceneView.UpdateDownloadAsset(currentAsset, currentProgress);
                 }
