@@ -28,6 +28,7 @@ namespace com.jbg.content.scene.view
         }
 
         private Params paramBuffer = null;
+        public Params ParamBuffer { get { return this.paramBuffer; } }
 
         [Header("Main View")]
         [SerializeField]
@@ -52,16 +53,22 @@ namespace com.jbg.content.scene.view
         {
             this.paramBuffer = p;
 
-            this.lottoBtn.Text = p.lottoBtnTxt;
+            this.UpdateTextUI();
 
             this.progress.fillAmount = 0f;
             this.progressTxt.text = string.Empty;
 
-            this.refreshBtn.Text = p.refreshBtnTxt;
-
             for (int i = 0; i < p.languagesList.Count; i++)
                 this.languageBtn.options.Add(new(p.languagesList[i]));
             this.languageBtn.onValueChanged.AddListener(this.OnClickChangeLanguage);
+        }
+
+        public void UpdateTextUI()
+        {
+            Params p = this.paramBuffer;
+
+            this.lottoBtn.Text = p.lottoBtnTxt;
+            this.refreshBtn.Text = p.refreshBtnTxt;
         }
 
         public void SetStateCheckAsset()

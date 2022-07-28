@@ -157,6 +157,14 @@ namespace com.jbg.content.scene
             LocaleControl.Language newLanguageCode = (LocaleControl.Language)option;
             DebugEx.Log("MAIN_SCENE new option is " + newLanguageCode.ToString());
             LocaleControl.LanguageCode = newLanguageCode;
+
+            MainView.Params p = this.sceneView.ParamBuffer;
+            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_LOTTO_BTN_TEXT);
+            p.checkAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_CHECKING_TEXT);
+            p.downloadAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
+            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
+
+            this.sceneView.UpdateTextUI();
         }
     }
 }
