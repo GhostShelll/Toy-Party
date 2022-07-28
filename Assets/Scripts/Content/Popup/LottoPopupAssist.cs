@@ -20,6 +20,7 @@ namespace com.jbg.content.popup
         private System.Action resultCallback;
 
         private Dictionary<int, List<int>> selectedNumbers;     // 각 슬롯 별로 선택된 번호들
+        private List<int> selectedNumbersAll;                   // 슬롯 상관없이 선택된 모든 번호들
         private Dictionary<int, int> resultNumbers;             // 각 슬롯 별로 지정된 번호들
 
         #region Static members
@@ -46,6 +47,10 @@ namespace com.jbg.content.popup
                 this.selectedNumbers.Clear();
             this.selectedNumbers = new();
 
+            if (this.selectedNumbersAll != null)
+                this.selectedNumbersAll.Clear();
+            this.selectedNumbersAll = new();
+
             if (this.resultNumbers != null)
                 this.resultNumbers.Clear();
             this.resultNumbers = new();
@@ -70,6 +75,10 @@ namespace com.jbg.content.popup
             if (this.selectedNumbers != null)
                 this.selectedNumbers.Clear();
             this.selectedNumbers = null;
+
+            if (this.selectedNumbersAll != null)
+                this.selectedNumbersAll.Clear();
+            this.selectedNumbersAll = null;
 
             if (this.resultNumbers != null)
                 this.resultNumbers.Clear();
@@ -105,6 +114,8 @@ namespace com.jbg.content.popup
                 else
                     this.selectedNumbers[btnNum].Clear();
 
+                this.selectedNumbersAll.Clear();
+
                 StringBuilder selectInfo = new();
                 for (int i = 0; i < selectedIndex.Length; i++)
                 {
@@ -117,6 +128,31 @@ namespace com.jbg.content.popup
                 }
 
                 this.popupView.SetSelectInfoText(btnNum - 1, selectInfo.ToString());
+
+                Dictionary<int, List<int>>.Enumerator enumerator = this.selectedNumbers.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    List<int> selectedNumbersOneSlot = enumerator.Current.Value;
+                    for (int i = 0; i < selectedNumbersOneSlot.Count; i++)
+                    {
+                        if (this.selectedNumbersAll.Contains(selectedNumbersOneSlot[i]))
+                            continue;
+
+                        this.selectedNumbersAll.Add(selectedNumbersOneSlot[i]);
+                    }
+                }
+
+                selectInfo.Clear();
+                for (int i = 0; i < this.selectedNumbersAll.Count; i++)
+                {
+                    int num = this.selectedNumbersAll[i];
+                    selectInfo.Append(num);
+                    if (i + 1 < this.selectedNumbersAll.Count)
+                        selectInfo.Append(", ");
+                }
+
+                this.popupView.SetSelectInfoAllText(selectInfo.ToString());
+
                 this.popupView.Show();
             });
         }

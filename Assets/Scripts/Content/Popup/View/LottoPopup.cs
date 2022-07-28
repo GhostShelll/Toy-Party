@@ -25,7 +25,13 @@ namespace com.jbg.content.popup.view
         [SerializeField]
         Text lottoInfoTxt;
         [SerializeField]
+        GameObject selectInfoObj;
+        [SerializeField]
         Text[] selectInfoTxt;
+        [SerializeField]
+        GameObject selectInfoAllObj;
+        [SerializeField]
+        Text selectInfoAllTxt;
         [SerializeField]
         Text[] resultInfoTxt;
         [SerializeField]
@@ -44,6 +50,8 @@ namespace com.jbg.content.popup.view
             for (int i = 0; i < this.selectInfoTxt.Length; i++)
                 this.selectInfoTxt[i].text = p.defaultSelectTxt;
 
+            this.selectInfoAllTxt.text = p.defaultSelectTxt;
+
             for (int i = 0; i < this.resultInfoTxt.Length; i++)
                 this.resultInfoTxt[i].text = LottoPopup.DEFAULT_NUMBER;
 
@@ -59,6 +67,11 @@ namespace com.jbg.content.popup.view
             }
 
             this.selectInfoTxt[index].text = text;
+        }
+
+        public void SetSelectInfoAllText(string text)
+        {
+            this.selectInfoAllTxt.text = text;
         }
 
         public void SetResultInfoText(int index, string text, bool isOverlap)
@@ -103,9 +116,14 @@ namespace com.jbg.content.popup.view
             this.lottoInfoTxt = t.FindComponent<Text>("Text");
 
             t = contents.Find("SelectInfo");
+            this.selectInfoObj = t.gameObject;
             this.selectInfoTxt = new Text[t.childCount];
             for (int i = 0; i < t.childCount; i++)
                 this.selectInfoTxt[i] = t.GetChild(i).FindComponent<Text>("Text");
+
+            t = contents.Find("SelectInfoAll");
+            this.selectInfoAllObj = t.gameObject;
+            this.selectInfoAllTxt = t.FindComponent<Text>("Text");
 
             t = contents.Find("ResultInfo");
             this.resultInfoTxt = new Text[t.childCount];
