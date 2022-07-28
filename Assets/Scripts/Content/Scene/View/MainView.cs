@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
 using com.jbg.core;
 using com.jbg.core.scene;
+using com.jbg.asset.control;
 
 namespace com.jbg.content.scene.view
 {
@@ -12,6 +15,7 @@ namespace com.jbg.content.scene.view
         {
             LottoSelect,
             RefreshAsset,
+            ChangeLanguage,
         };
 
         public class Params
@@ -20,9 +24,11 @@ namespace com.jbg.content.scene.view
             public string checkAssetTxt;
             public string downloadAssetTxt;
             public string refreshBtnTxt;
+            public List<string> languagesList;
         }
 
         private Params paramBuffer = null;
+        public Params ParamBuffer { get { return this.paramBuffer; } }
 
         [Header("Main View")]
         [SerializeField]
@@ -38,17 +44,30 @@ namespace com.jbg.content.scene.view
         [SerializeField]
         ButtonComponent refreshBtn;
 
+        [SerializeField]
+        Dropdown languageBtn;
+
         private int dotCount = 1;
 
         public void OnOpen(Params p)
         {
             this.paramBuffer = p;
 
-            this.lottoBtn.Text = p.lottoBtnTxt;
+            this.UpdateTextUI();
 
             this.progress.fillAmount = 0f;
             this.progressTxt.text = string.Empty;
 
+            for (int i = 0; i < p.languagesList.Count; i++)
+                this.languageBtn.options.Add(new(p.languagesList[i]));
+            this.languageBtn.onValueChanged.AddListener(this.OnClickChangeLanguage);
+        }
+
+        public void UpdateTextUI()
+        {
+            Params p = this.paramBuffer;
+
+            this.lottoBtn.Text = p.lottoBtnTxt;
             this.refreshBtn.Text = p.refreshBtnTxt;
         }
 
@@ -57,6 +76,7 @@ namespace com.jbg.content.scene.view
             this.lottoBtn.GameObject.SetActive(false);
             this.progressObj.SetActive(true);
             this.refreshBtn.Interactable = false;
+            this.languageBtn.interactable = false;
         }
 
         public void SetStateWaitDone()
@@ -64,6 +84,7 @@ namespace com.jbg.content.scene.view
             this.lottoBtn.GameObject.SetActive(true);
             this.progressObj.SetActive(false);
             this.refreshBtn.Interactable = true;
+            this.languageBtn.interactable = true;
         }
 
         public void UpdateCheckAsset(float progress)
@@ -100,6 +121,12 @@ namespace com.jbg.content.scene.view
             this.progressTxt.text = downloadAssetTxt;
         }
 
+        public void SetLanguageState(int optionNum)
+        {
+            this.languageBtn.SetValueWithoutNotify(optionNum);
+            this.languageBtn.RefreshShownValue();
+        }
+
         public void OnClickLottoSelect()
         {
             this.DoEvent(Event.LottoSelect);
@@ -108,6 +135,11 @@ namespace com.jbg.content.scene.view
         public void OnClickRefreshAsset()
         {
             this.DoEvent(Event.RefreshAsset);
+        }
+
+        public void OnClickChangeLanguage(int option)
+        {
+            this.DoEvent(Event.ChangeLanguage, option);
         }
 
 #if UNITY_EDITOR
@@ -128,6 +160,9 @@ namespace com.jbg.content.scene.view
 
             t = cached.Find("BtnRefresh");
             this.refreshBtn = new ButtonComponent(t);
+
+            t = cached.Find("BtnLanguage");
+            this.languageBtn = t.GetComponent<Dropdown>();
         }
 #endif  // UNITY_EDITOR
     }
