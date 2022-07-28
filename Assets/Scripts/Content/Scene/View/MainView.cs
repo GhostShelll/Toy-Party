@@ -76,7 +76,7 @@ namespace com.jbg.content.scene.view
             this.lottoBtn.GameObject.SetActive(false);
             this.progressObj.SetActive(true);
             this.refreshBtn.Interactable = false;
-            this.languageBtn.enabled = false;
+            this.languageBtn.interactable = false;
         }
 
         public void SetStateWaitDone()
@@ -84,7 +84,7 @@ namespace com.jbg.content.scene.view
             this.lottoBtn.GameObject.SetActive(true);
             this.progressObj.SetActive(false);
             this.refreshBtn.Interactable = true;
-            this.languageBtn.enabled = true;
+            this.languageBtn.interactable = true;
         }
 
         public void UpdateCheckAsset(float progress)
