@@ -71,7 +71,7 @@ namespace com.jbg.content.popup.view
                 if (selectIndex.Contains(i))
                     this.countTxt[i].color = highToggleOn ? Color.red : middleToggleOn ? Color.yellow : Color.blue;
                 else
-                    this.countTxt[i].color = Color.white;
+                    this.countTxt[i].color = UnityEx.DefaultTextColor;
             }
         }
 
