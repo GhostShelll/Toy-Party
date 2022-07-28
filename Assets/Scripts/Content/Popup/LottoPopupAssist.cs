@@ -176,20 +176,36 @@ namespace com.jbg.content.popup
 
             this.resultNumbers.Clear();
 
-            Dictionary<int, List<int>>.Enumerator enumerator1 = this.selectedNumbers.GetEnumerator();
-            while (enumerator1.MoveNext())
+            if (this.combineSelectMode && this.combinedSelectedNumbers.Count > 0)
             {
-                int key = enumerator1.Current.Key;
-                List<int> value = enumerator1.Current.Value;
-                value.Shuffle();
+                this.combinedSelectedNumbers.Shuffle();
 
-                int pickNumber = value[0];
-                if (containCheck.Contains(pickNumber) == false)
-                    containCheck.Add(pickNumber);
-                else
-                    overlapCheck.Add(pickNumber);
+                for (int i = 0; i < 6; i++)
+                {
+                    int key = i + 1;
+                    if (this.combinedSelectedNumbers.Count >= key)
+                        this.resultNumbers.Add(key, this.combinedSelectedNumbers[i]);
+                    else
+                        this.resultNumbers.Add(key, 0);
+                }
+            }
+            else
+            {
+                Dictionary<int, List<int>>.Enumerator enumerator1 = this.selectedNumbers.GetEnumerator();
+                while (enumerator1.MoveNext())
+                {
+                    int key = enumerator1.Current.Key;
+                    List<int> value = enumerator1.Current.Value;
+                    value.Shuffle();
 
-                this.resultNumbers.Add(key, pickNumber);
+                    int pickNumber = value[0];
+                    if (containCheck.Contains(pickNumber) == false)
+                        containCheck.Add(pickNumber);
+                    else
+                        overlapCheck.Add(pickNumber);
+
+                    this.resultNumbers.Add(key, pickNumber);
+                }
             }
 
             Dictionary<int, int>.Enumerator enumerator2 = this.resultNumbers.GetEnumerator();
