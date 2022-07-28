@@ -7,6 +7,12 @@ Lotto 번호 생성기
 2021.3.4f1
 
 ## Version Info
+### 1.0.3
+- **Table 읽어오는 기능 변경**
+  - [Google Sheets To Unity](https://assetstore.unity.com/packages/tools/utilities/google-sheets-to-unity-73410) 외부 Asset 제거
+  - Google Sheet를 Web에 게시하고, 해당 정보에 Web Request로 접근하여 Download 받도록 수정
+- Android Build 가능하도록 수정
+- **언어 변경 기능 구현**
 ### 1.0.2
 - **번호가 '많이 나온 횟수'와 '적게 나온 횟수'의 평균 값을 기준으로 번호를 선택할 수 있게하는 Toggle 기능 구현**
 - Unity Package Version 최신화
