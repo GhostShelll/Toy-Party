@@ -40,6 +40,11 @@ namespace com.jbg.asset.data
         public const int LOTTO_POPUP_TITLE_TEXT = 1106;
 
         /// <summary>
+        /// 로또 번호 팝업의 번호 통합 토클 문구
+        /// </summary>
+        public const int LOTTO_POPUP_TOGGLE_TEXT = 1107;
+
+        /// <summary>
         /// 에셋 로딩 문구
         /// </summary>
         public const int MAIN_SCENE_ASSET_LOADING_TEXT = 1200;
