@@ -11,6 +11,7 @@ namespace com.jbg.content.popup.view
         public enum Event
         {
             Select,
+            CombineSelectMode,
             Shuffle,
         }
 
@@ -18,6 +19,7 @@ namespace com.jbg.content.popup.view
         {
             public string lottoInfoTxt;
             public string defaultSelectTxt;
+            public string combineSelectToggleTxt;
             public string btnShuffleTxt;
         }
 
@@ -29,11 +31,15 @@ namespace com.jbg.content.popup.view
         [SerializeField]
         Text[] selectInfoTxt;
         [SerializeField]
-        GameObject selectInfoAllObj;
+        GameObject combineSelectInfoObj;
         [SerializeField]
-        Text selectInfoAllTxt;
+        Text combineSelectInfoTxt;
         [SerializeField]
         Text[] resultInfoTxt;
+        [SerializeField]
+        Toggle combineSelectToggle;
+        [SerializeField]
+        Text combineSelectToggleTxt;
         [SerializeField]
         ButtonComponent btnShuffle;
 
@@ -50,12 +56,21 @@ namespace com.jbg.content.popup.view
             for (int i = 0; i < this.selectInfoTxt.Length; i++)
                 this.selectInfoTxt[i].text = p.defaultSelectTxt;
 
-            this.selectInfoAllTxt.text = p.defaultSelectTxt;
+            this.combineSelectInfoTxt.text = p.defaultSelectTxt;
 
             for (int i = 0; i < this.resultInfoTxt.Length; i++)
                 this.resultInfoTxt[i].text = LottoPopup.DEFAULT_NUMBER;
 
+            this.combineSelectToggle.isOn = false;
+            this.combineSelectToggleTxt.text = p.combineSelectToggleTxt;
+
             this.btnShuffle.Text = p.btnShuffleTxt;
+        }
+
+        public void SetStateSelectInfo(bool isCombineSelectMode)
+        {
+            this.selectInfoObj.SetActive(isCombineSelectMode == false);
+            this.combineSelectInfoObj.SetActive(isCombineSelectMode);
         }
 
         public void SetSelectInfoText(int index, string text)
@@ -69,9 +84,9 @@ namespace com.jbg.content.popup.view
             this.selectInfoTxt[index].text = text;
         }
 
-        public void SetSelectInfoAllText(string text)
+        public void SetCombineSelectInfoText(string text)
         {
-            this.selectInfoAllTxt.text = text;
+            this.combineSelectInfoTxt.text = text;
         }
 
         public void SetResultInfoText(int index, string text, bool isOverlap)
@@ -99,6 +114,11 @@ namespace com.jbg.content.popup.view
             this.DoEvent(Event.Select, num);
         }
 
+        public void OnClickCombineSelectMode()
+        {
+            this.DoEvent(Event.CombineSelectMode, this.combineSelectToggle.isOn);
+        }
+
         public void OnClickShuffle()
         {
             this.DoEvent(Event.Shuffle);
@@ -121,14 +141,18 @@ namespace com.jbg.content.popup.view
             for (int i = 0; i < t.childCount; i++)
                 this.selectInfoTxt[i] = t.GetChild(i).FindComponent<Text>("Text");
 
-            t = contents.Find("SelectInfoAll");
-            this.selectInfoAllObj = t.gameObject;
-            this.selectInfoAllTxt = t.FindComponent<Text>("Text");
+            t = contents.Find("CombineSelectInfo");
+            this.combineSelectInfoObj = t.gameObject;
+            this.combineSelectInfoTxt = t.FindComponent<Text>("Text");
 
             t = contents.Find("ResultInfo");
             this.resultInfoTxt = new Text[t.childCount];
             for (int i = 0; i < t.childCount; i++)
                 this.resultInfoTxt[i] = t.GetChild(i).FindComponent<Text>("Text");
+
+            t = contents.Find("ToggleCombineSelectMode");
+            this.combineSelectToggle = t.GetComponent<Toggle>();
+            this.combineSelectToggleTxt = t.FindComponent<Text>("Text");
 
             t = contents.Find("BtnShuffle");
             this.btnShuffle = new ButtonComponent(t);
