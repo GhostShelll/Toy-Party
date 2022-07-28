@@ -142,6 +142,8 @@ namespace com.jbg.content.popup
                     }
                 }
 
+                this.selectedNumbersAll.Sort();
+
                 selectInfo.Clear();
                 for (int i = 0; i < this.selectedNumbersAll.Count; i++)
                 {
