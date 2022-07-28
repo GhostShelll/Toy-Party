@@ -70,7 +70,7 @@ namespace com.jbg.content.popup.view
             }
 
             this.resultInfoTxt[index].text = text;
-            this.resultInfoTxt[index].color = isOverlap ? Color.red : Color.white;
+            this.resultInfoTxt[index].color = isOverlap ? Color.red : UnityEx.DefaultTextColor;
         }
 
         public void OnClickSelect(GameObject go)

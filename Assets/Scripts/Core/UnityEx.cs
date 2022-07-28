@@ -4,6 +4,18 @@ namespace com.jbg.core
 {
     public static class UnityEx
     {
+        private static Color _defaultTextColor = default;
+        public static Color DefaultTextColor
+        {
+            get
+            {
+                if (UnityEx._defaultTextColor == default)
+                    ColorUtility.TryParseHtmlString("#323232FF", out UnityEx._defaultTextColor);
+                
+                return UnityEx._defaultTextColor;
+            }
+        }
+
         public static void ShowTransform(this Transform trans)
         {
             if (trans == null)
