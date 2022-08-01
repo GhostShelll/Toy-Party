@@ -3,6 +3,17 @@ namespace com.jbg.asset.data
     public static class LocaleCodes
     {
         public const int BTN_OK = 1000;
+        public const int BTN_CANCEL = 1001;
+
+        /// <summary>
+        /// 종료 팝업 제목
+        /// </summary>
+        public const int QUIT_POPUP_TITLE = 1002;
+
+        /// <summary>
+        /// 종료 팝업 문구
+        /// </summary>
+        public const int QUIT_POPUP_MSG = 1003;
 
         /// <summary>
         /// 로또 팝업의 안내 문구
