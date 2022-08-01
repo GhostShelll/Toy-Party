@@ -54,6 +54,23 @@ namespace com.jbg.content.scene
             this.sceneView.RemoveEvent(MainView.Event.ChangeLanguage);
         }
 
+        protected override void OnBack()
+        {
+            base.OnBack();
+
+            string title = LocaleControl.GetString(LocaleCodes.QUIT_POPUP_TITLE);
+            string message = LocaleControl.GetString(LocaleCodes.QUIT_POPUP_MSG);
+            PopupAssist.OpenNoticeTwoBtnPopup(title, message, (popup) =>
+            {
+                if (popup.IsOK)
+#if UNITY_EDITOR
+                    UnityEditor.EditorApplication.ExitPlaymode();
+#else
+                    Application.Quit();
+#endif  // UNITY_EDITOR
+            });
+        }
+
         private void SetStateCheckAsset()
         {
             this.SetState((int)STATE.CheckAsset);
