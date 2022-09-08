@@ -3,6 +3,17 @@ namespace com.jbg.asset.data
     public static class LocaleCodes
     {
         public const int BTN_OK = 1000;
+        public const int BTN_CANCEL = 1001;
+
+        /// <summary>
+        /// 종료 팝업 제목
+        /// </summary>
+        public const int QUIT_POPUP_TITLE = 1002;
+
+        /// <summary>
+        /// 종료 팝업 문구
+        /// </summary>
+        public const int QUIT_POPUP_MSG = 1003;
 
         /// <summary>
         /// 로또 팝업의 안내 문구
@@ -38,6 +49,11 @@ namespace com.jbg.asset.data
         /// 로또 번호 팝업의 제목 문구
         /// </summary>
         public const int LOTTO_POPUP_TITLE_TEXT = 1106;
+
+        /// <summary>
+        /// 로또 번호 팝업의 번호 통합 토클 문구
+        /// </summary>
+        public const int LOTTO_POPUP_TOGGLE_TEXT = 1107;
 
         /// <summary>
         /// 에셋 로딩 문구

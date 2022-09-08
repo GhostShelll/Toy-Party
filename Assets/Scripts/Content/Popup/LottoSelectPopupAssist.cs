@@ -130,19 +130,8 @@ namespace com.jbg.content.popup
                 }
                 else if (this.middleMode)
                 {
-                    bool isEven = this.numberRange % 2 == 0;
-                    if (isEven)
-                    {
-                        int value = (int)(this.numberRange * 0.5f);
-                        if (pinPoint - value <= num && num <= pinPoint + value)
-                            this.selectedIndex.Add(i);
-                    }
-                    else
-                    {
-                        int value = (int)((this.numberRange - 1) * 0.5f);
-                        if (pinPoint - value <= num && num <= pinPoint + value)
-                            this.selectedIndex.Add(i);
-                    }
+                    if (pinPoint - this.numberRange <= num && num <= pinPoint + this.numberRange)
+                        this.selectedIndex.Add(i);
                 }
                 else
                 {

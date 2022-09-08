@@ -20,7 +20,9 @@ namespace com.jbg.content.popup
         private System.Action resultCallback;
 
         private Dictionary<int, List<int>> selectedNumbers;     // 각 슬롯 별로 선택된 번호들
+        private List<int> combinedSelectedNumbers;              // 슬롯 상관없이 선택된 모든 번호들
         private Dictionary<int, int> resultNumbers;             // 각 슬롯 별로 지정된 번호들
+        private bool combineSelectMode;
 
         #region Static members
         public static void Open(System.Action resultCallback)
@@ -46,14 +48,21 @@ namespace com.jbg.content.popup
                 this.selectedNumbers.Clear();
             this.selectedNumbers = new();
 
+            if (this.combinedSelectedNumbers != null)
+                this.combinedSelectedNumbers.Clear();
+            this.combinedSelectedNumbers = new();
+
             if (this.resultNumbers != null)
                 this.resultNumbers.Clear();
             this.resultNumbers = new();
+
+            this.combineSelectMode = false;
 
             LottoPopup.Params p = new();
             p.title = string.Format(LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TITLE_TEXT), LottoResultControl.RecentPeriod + 1);
             p.lottoInfoTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_MSG);
             p.defaultSelectTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_DEFAULT_SELECT);
+            p.combineSelectToggleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_TOGGLE_TEXT);
             p.btnShuffleTxt = LocaleControl.GetString(LocaleCodes.LOTTO_POPUP_SHUFFLE_BTN_TEXT);
 
             PopupAssist.OpenPopup("Popup_Lotto", p, this.ResultCallback, this.LoadedCallback);
@@ -62,6 +71,7 @@ namespace com.jbg.content.popup
         private void ResultCallback(Popup popup)
         {
             this.popupView.RemoveEvent(LottoPopup.Event.Select);
+            this.popupView.RemoveEvent(LottoPopup.Event.CombineSelectMode);
             this.popupView.RemoveEvent(LottoPopup.Event.Shuffle);
 
             this.resultCallback?.Invoke();
@@ -70,6 +80,10 @@ namespace com.jbg.content.popup
             if (this.selectedNumbers != null)
                 this.selectedNumbers.Clear();
             this.selectedNumbers = null;
+
+            if (this.combinedSelectedNumbers != null)
+                this.combinedSelectedNumbers.Clear();
+            this.combinedSelectedNumbers = null;
 
             if (this.resultNumbers != null)
                 this.resultNumbers.Clear();
@@ -83,7 +97,10 @@ namespace com.jbg.content.popup
             this.popupView = (LottoPopup)popup;
 
             this.popupView.BindEvent(LottoPopup.Event.Select, this.OnClickSelect);
+            this.popupView.BindEvent(LottoPopup.Event.CombineSelectMode, this.OnClickCombineSelectMode);
             this.popupView.BindEvent(LottoPopup.Event.Shuffle, this.OnClickShuffle);
+
+            this.popupView.SetStateSelectInfo(false);
         }
 
         private void OnClickSelect(int eventNum, object obj)
@@ -105,6 +122,8 @@ namespace com.jbg.content.popup
                 else
                     this.selectedNumbers[btnNum].Clear();
 
+                this.combinedSelectedNumbers.Clear();
+
                 StringBuilder selectInfo = new();
                 for (int i = 0; i < selectedIndex.Length; i++)
                 {
@@ -117,6 +136,33 @@ namespace com.jbg.content.popup
                 }
 
                 this.popupView.SetSelectInfoText(btnNum - 1, selectInfo.ToString());
+
+                Dictionary<int, List<int>>.Enumerator enumerator = this.selectedNumbers.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    List<int> oneSlotNumbers = enumerator.Current.Value;
+                    for (int i = 0; i < oneSlotNumbers.Count; i++)
+                    {
+                        if (this.combinedSelectedNumbers.Contains(oneSlotNumbers[i]))
+                            continue;
+
+                        this.combinedSelectedNumbers.Add(oneSlotNumbers[i]);
+                    }
+                }
+
+                this.combinedSelectedNumbers.Sort();
+
+                selectInfo.Clear();
+                for (int i = 0; i < this.combinedSelectedNumbers.Count; i++)
+                {
+                    int num = this.combinedSelectedNumbers[i];
+                    selectInfo.Append(num);
+                    if (i + 1 < this.combinedSelectedNumbers.Count)
+                        selectInfo.Append(", ");
+                }
+
+                this.popupView.SetCombineSelectInfoText(selectInfo.ToString());
+
                 this.popupView.Show();
             });
         }
@@ -130,20 +176,36 @@ namespace com.jbg.content.popup
 
             this.resultNumbers.Clear();
 
-            Dictionary<int, List<int>>.Enumerator enumerator1 = this.selectedNumbers.GetEnumerator();
-            while (enumerator1.MoveNext())
+            if (this.combineSelectMode && this.combinedSelectedNumbers.Count > 0)
             {
-                int key = enumerator1.Current.Key;
-                List<int> value = enumerator1.Current.Value;
-                value.Shuffle();
+                this.combinedSelectedNumbers.Shuffle();
 
-                int pickNumber = value[0];
-                if (containCheck.Contains(pickNumber) == false)
-                    containCheck.Add(pickNumber);
-                else
-                    overlapCheck.Add(pickNumber);
+                for (int i = 0; i < 6; i++)
+                {
+                    int key = i + 1;
+                    if (this.combinedSelectedNumbers.Count >= key)
+                        this.resultNumbers.Add(key, this.combinedSelectedNumbers[i]);
+                    else
+                        this.resultNumbers.Add(key, 0);
+                }
+            }
+            else
+            {
+                Dictionary<int, List<int>>.Enumerator enumerator1 = this.selectedNumbers.GetEnumerator();
+                while (enumerator1.MoveNext())
+                {
+                    int key = enumerator1.Current.Key;
+                    List<int> value = enumerator1.Current.Value;
+                    value.Shuffle();
 
-                this.resultNumbers.Add(key, pickNumber);
+                    int pickNumber = value[0];
+                    if (containCheck.Contains(pickNumber) == false)
+                        containCheck.Add(pickNumber);
+                    else
+                        overlapCheck.Add(pickNumber);
+
+                    this.resultNumbers.Add(key, pickNumber);
+                }
             }
 
             Dictionary<int, int>.Enumerator enumerator2 = this.resultNumbers.GetEnumerator();
@@ -155,6 +217,23 @@ namespace com.jbg.content.popup
 
                 this.popupView.SetResultInfoText(key - 1, value.ToString(), isOverlap);
             }
+        }
+
+        private void OnClickCombineSelectMode(int eventNum, object obj)
+        {
+            SoundManager.Inst.Play(SoundManager.SOUND_YES);
+
+            bool parse = bool.TryParse(obj.ToString(), out bool isOn);
+            if (parse == false)
+            {
+                DebugEx.LogColor("LOTTO_POPUP_ASSIST PARSE ERROR", "red");
+                return;
+            }
+
+            DebugEx.Log("LOTTO_POPUP_ASSIST All Select Mode is " + isOn.ToString());
+            this.combineSelectMode = isOn;
+
+            this.popupView.SetStateSelectInfo(this.combineSelectMode && this.combinedSelectedNumbers.Count > 0);
         }
         #endregion
     }

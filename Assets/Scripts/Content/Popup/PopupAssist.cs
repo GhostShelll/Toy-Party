@@ -42,5 +42,16 @@ namespace com.jbg.content.popup
 
             return Assist.OpenPopup("Popup_Notice_1Btn", p, resultCallback);
         }
+
+        public static Popup OpenNoticeTwoBtnPopup(string title, string message, System.Action<Popup> resultCallback)
+        {
+            Popup.Params p = new();
+            p.title = title;
+            p.message = message;
+            p.btnOkText = LocaleControl.GetString(LocaleCodes.BTN_OK);
+            p.btnCancelText = LocaleControl.GetString(LocaleCodes.BTN_CANCEL);
+
+            return Assist.OpenPopup("Popup_Notice_2Btn", p, resultCallback);
+        }
     }
 }
