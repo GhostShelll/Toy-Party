@@ -25,8 +25,6 @@ namespace com.jbg.asset
 
         public static readonly string PATH_ASSET = UnityEngine.Application.persistentDataPath + "/Asset/";
         public static readonly string PATH_ASSET_TABLE_VERSION_DATA = Manager.PATH_ASSET + TableVersionControl.TABLE_NAME + ".csv";
-        public static readonly string PATH_ASSET_LOCALE_DATA = Manager.PATH_ASSET + LocaleControl.TABLE_NAME + ".csv";
-        public static readonly string PATH_ASSET_LOTTO_RESULT_DATA = Manager.PATH_ASSET + LottoResultControl.TABLE_NAME + ".csv";
 
         private struct DownloadData
         {
@@ -49,8 +47,6 @@ namespace com.jbg.asset
 
             // 각종 에셋 오픈
             TableVersionControl.Open();
-            LocaleControl.Open();
-            LottoResultControl.Open();
         }
 
         public static void Close()
@@ -63,8 +59,6 @@ namespace com.jbg.asset
 
                 // 각종 에셋 클로즈
                 TableVersionControl.Close();
-                LocaleControl.Close();
-                LottoResultControl.Close();
             }
         }
 
@@ -73,10 +67,8 @@ namespace com.jbg.asset
             // 로딩 과정 시작
             Manager.DownloadDone = false;
 
-            // 로딩할 것들 목록 만들기
+            // TODO[jbg] : 로딩할 것들 목록 만들기
             List<DownloadData> downloadList = new();
-            downloadList.Add(new() { tableName = LocaleControl.TABLE_NAME, localPath = Manager.PATH_ASSET_LOCALE_DATA, updateDataCallback = LocaleControl.UpdateData, });
-            downloadList.Add(new() { tableName = LottoResultControl.TABLE_NAME, localPath = Manager.PATH_ASSET_LOTTO_RESULT_DATA, updateDataCallback = LottoResultControl.UpdateData, });
 
             // 리스트 순회하면서 다운로드 순차 진행
             for (int i = 0; i < downloadList.Count; i++)
