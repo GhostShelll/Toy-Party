@@ -31,9 +31,9 @@ namespace com.jbg.content.scene
             this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
 
             MainView.Params p = new();
-            p.checkAssetTxt = "@@테이블 체크중";
-            p.downloadAssetTxt = "@@{0} 테이블 다운로드중";
-            p.refreshBtnTxt = "@@테이블 갱신";
+            p.checkAssetTxt = "**테이블 체크중";
+            p.downloadAssetTxt = "**{0} 테이블 다운로드중";
+            p.refreshBtnTxt = "**테이블 갱신";
 
             this.sceneView.OnOpen(p);
 
@@ -51,8 +51,8 @@ namespace com.jbg.content.scene
         {
             base.OnBack();
 
-            string title = "@@종료";
-            string message = "@@종료하시겠습니까?";
+            string title = "**종료";
+            string message = "**종료하시겠습니까?";
             PopupAssist.OpenNoticeTwoBtnPopup(title, message, (popup) =>
             {
                 if (popup.IsOK)
