@@ -28,19 +28,14 @@ namespace com.jbg.content.scene
 
             this.sceneView = (MainView)this.SceneView;
 
-            this.sceneView.BindEvent(MainView.Event.LottoSelect, this.OnClickLottoSelect);
             this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
-            this.sceneView.BindEvent(MainView.Event.ChangeLanguage, this.OnClickChangeLanguage);
 
             MainView.Params p = new();
-            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_LOTTO_BTN_TEXT);
-            p.checkAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_CHECKING_TEXT);
-            p.downloadAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
-            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
-            p.languagesList = new() { "한국어", "English" };
+            p.checkAssetTxt = "@@테이블 체크중";
+            p.downloadAssetTxt = "@@{0} 테이블 다운로드중";
+            p.refreshBtnTxt = "@@테이블 갱신";
 
             this.sceneView.OnOpen(p);
-            this.sceneView.SetLanguageState((int)LocaleControl.LanguageCode);
 
             this.SetStateCheckAsset();
         }
@@ -49,17 +44,15 @@ namespace com.jbg.content.scene
         {
             base.OnClose();
 
-            this.sceneView.RemoveEvent(MainView.Event.LottoSelect);
             this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
-            this.sceneView.RemoveEvent(MainView.Event.ChangeLanguage);
         }
 
         protected override void OnBack()
         {
             base.OnBack();
 
-            string title = LocaleControl.GetString(LocaleCodes.QUIT_POPUP_TITLE);
-            string message = LocaleControl.GetString(LocaleCodes.QUIT_POPUP_MSG);
+            string title = "@@종료";
+            string message = "@@종료하시겠습니까?";
             PopupAssist.OpenNoticeTwoBtnPopup(title, message, (popup) =>
             {
                 if (popup.IsOK)
@@ -135,53 +128,12 @@ namespace com.jbg.content.scene
             this.sceneView.SetStateWaitDone();
         }
 
-        private void OnClickLottoSelect(int eventNum, object obj)
-        {
-            SoundManager.Inst.Play(SoundManager.SOUND_YES);
-
-            LottoPopupAssist.Open(() =>
-            {
-
-            });
-        }
-
         private void OnClickRefreshAsset(int eventNum, object obj)
         {
             SoundManager.Inst.Play(SoundManager.SOUND_YES);
 
             // 에셋 갱신 시작
             this.SetStateCheckAsset();
-        }
-
-        private void OnClickChangeLanguage(int eventNum, object obj)
-        {
-            SoundManager.Inst.Play(SoundManager.SOUND_YES);
-
-            bool parse = int.TryParse(obj.ToString(), out int option);
-            if (parse == false)
-            {
-                DebugEx.LogColor("MAIN_SCENE PARSE ERROR", "red");
-                return;
-            }
-
-            bool isDefined = System.Enum.IsDefined(typeof(LocaleControl.Language), option);
-            if (isDefined == false)
-            {
-                DebugEx.LogColor("MAIN_SCENE new option is not defined. Option : " + option, "red");
-                return;
-            }
-
-            LocaleControl.Language newLanguageCode = (LocaleControl.Language)option;
-            DebugEx.Log("MAIN_SCENE new option is " + newLanguageCode.ToString());
-            LocaleControl.LanguageCode = newLanguageCode;
-
-            MainView.Params p = this.sceneView.ParamBuffer;
-            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_LOTTO_BTN_TEXT);
-            p.checkAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_CHECKING_TEXT);
-            p.downloadAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
-            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
-
-            this.sceneView.UpdateTextUI();
         }
     }
 }

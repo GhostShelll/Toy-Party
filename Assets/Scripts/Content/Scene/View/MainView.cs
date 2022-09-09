@@ -13,27 +13,20 @@ namespace com.jbg.content.scene.view
     {
         public enum Event
         {
-            LottoSelect,
             RefreshAsset,
-            ChangeLanguage,
         };
 
         public class Params
         {
-            public string lottoBtnTxt;
             public string checkAssetTxt;
             public string downloadAssetTxt;
             public string refreshBtnTxt;
-            public List<string> languagesList;
         }
 
         private Params paramBuffer = null;
         public Params ParamBuffer { get { return this.paramBuffer; } }
 
         [Header("Main View")]
-        [SerializeField]
-        ButtonComponent lottoBtn;
-
         [SerializeField]
         GameObject progressObj;
         [SerializeField]
@@ -44,47 +37,28 @@ namespace com.jbg.content.scene.view
         [SerializeField]
         ButtonComponent refreshBtn;
 
-        [SerializeField]
-        Dropdown languageBtn;
-
         private int dotCount = 1;
 
         public void OnOpen(Params p)
         {
             this.paramBuffer = p;
 
-            this.UpdateTextUI();
-
             this.progress.fillAmount = 0f;
             this.progressTxt.text = string.Empty;
 
-            for (int i = 0; i < p.languagesList.Count; i++)
-                this.languageBtn.options.Add(new(p.languagesList[i]));
-            this.languageBtn.onValueChanged.AddListener(this.OnClickChangeLanguage);
-        }
-
-        public void UpdateTextUI()
-        {
-            Params p = this.paramBuffer;
-
-            this.lottoBtn.Text = p.lottoBtnTxt;
             this.refreshBtn.Text = p.refreshBtnTxt;
         }
 
         public void SetStateCheckAsset()
         {
-            this.lottoBtn.GameObject.SetActive(false);
             this.progressObj.SetActive(true);
             this.refreshBtn.Interactable = false;
-            this.languageBtn.interactable = false;
         }
 
         public void SetStateWaitDone()
         {
-            this.lottoBtn.GameObject.SetActive(true);
             this.progressObj.SetActive(false);
             this.refreshBtn.Interactable = true;
-            this.languageBtn.interactable = true;
         }
 
         public void UpdateCheckAsset(float progress)
@@ -121,25 +95,9 @@ namespace com.jbg.content.scene.view
             this.progressTxt.text = downloadAssetTxt;
         }
 
-        public void SetLanguageState(int optionNum)
-        {
-            this.languageBtn.SetValueWithoutNotify(optionNum);
-            this.languageBtn.RefreshShownValue();
-        }
-
-        public void OnClickLottoSelect()
-        {
-            this.DoEvent(Event.LottoSelect);
-        }
-
         public void OnClickRefreshAsset()
         {
             this.DoEvent(Event.RefreshAsset);
-        }
-
-        public void OnClickChangeLanguage(int option)
-        {
-            this.DoEvent(Event.ChangeLanguage, option);
         }
 
 #if UNITY_EDITOR
@@ -150,9 +108,6 @@ namespace com.jbg.content.scene.view
             Transform cached = this.CachedTransform.Find("Canvas/Padding");
             Transform t;
 
-            t = cached.Find("BtnLottoSelect");
-            this.lottoBtn = new ButtonComponent(t);
-
             t = cached.Find("ProgressSlider");
             this.progressObj = t.gameObject;
             this.progress = t.FindComponent<Image>("Fill");
@@ -160,9 +115,6 @@ namespace com.jbg.content.scene.view
 
             t = cached.Find("BtnRefresh");
             this.refreshBtn = new ButtonComponent(t);
-
-            t = cached.Find("BtnLanguage");
-            this.languageBtn = t.GetComponent<Dropdown>();
         }
 #endif  // UNITY_EDITOR
     }
