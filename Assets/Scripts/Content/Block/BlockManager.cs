@@ -20,6 +20,12 @@ namespace com.jbg.content.block
             Yellow,
         };
 
+        public enum Special
+        {
+            UFO,
+            Turtle,
+        };
+
         [Header("Block Manager")]
         [SerializeField]
         List<Sprite> normalBlockSprites;
@@ -27,6 +33,9 @@ namespace com.jbg.content.block
         List<Sprite> packBlockSprites;
         [SerializeField]
         List<Sprite> blockLineSprites;
+
+        [SerializeField]
+        List<Sprite> specialBlockSprites;
 
         private BlockCell[][] blockMap;
 
@@ -77,6 +86,10 @@ namespace com.jbg.content.block
             this.blockLineSprites.Add(Resources.Load<Sprite>(BlockManager.BLOCK_BASE_PATH + "blk_p_vertical_line"));
             this.blockLineSprites.Add(Resources.Load<Sprite>(BlockManager.BLOCK_BASE_PATH + "blk_r_vertical_line"));
             this.blockLineSprites.Add(Resources.Load<Sprite>(BlockManager.BLOCK_BASE_PATH + "blk_y_vertical_line"));
+
+            this.specialBlockSprites = new();
+            this.specialBlockSprites.Add(Resources.Load<Sprite>(BlockManager.BLOCK_BASE_PATH + "blk_z_munchkin"));
+            this.specialBlockSprites.Add(Resources.Load<Sprite>(BlockManager.BLOCK_BASE_PATH + "blk_z_rainbow"));
         }
 #endif  // UNITY_EDITOR
     }

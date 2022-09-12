@@ -1324,6 +1324,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c165fcf07c65d474080a03bbaa5e11f1, type: 3}
   - {fileID: 21300000, guid: ec862d6b16d872244a280f643a41cf43, type: 3}
   - {fileID: 21300000, guid: fe897d12d15ddde40b6587dd36b8aef1, type: 3}
+  specialBlockSprites:
+  - {fileID: 21300000, guid: cd758aa7764cf82438a7eaf794ff01a1, type: 3}
+  - {fileID: 21300000, guid: 63881937c2f4b7449b2e5f1fd433ceda, type: 3}
 --- !u!1001 &665946081
 PrefabInstance:
   m_ObjectHideFlags: 0
