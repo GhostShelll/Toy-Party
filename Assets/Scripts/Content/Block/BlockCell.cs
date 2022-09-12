@@ -9,18 +9,18 @@ namespace com.jbg.content.block
     {
         [Header("Block Cell")]
         [SerializeField]
-        Image bgImg;
+        Image imgBg;
         [SerializeField]
-        Image debugImg;
+        Image imgDebug;
         [SerializeField]
-        Image debugForwardImg;
+        Image imgDebugForward;
 
         private void Awake()
         {
 #if LOG_DEBUG
-            this.debugImg.transform.parent.gameObject.SetActive(true);
+            this.imgDebug.transform.parent.gameObject.SetActive(true);
 #else
-            this.debugImg.transform.parent.gameObject.SetActive(false);
+            this.imgDebug.transform.parent.gameObject.SetActive(false);
 #endif  // LOG_DEBUG
         }
 
@@ -33,11 +33,11 @@ namespace com.jbg.content.block
             Transform t;
 
             t = cached.Find("Bg");
-            this.bgImg = t.GetComponent<Image>();
+            this.imgBg = t.GetComponent<Image>();
 
-            t = cached.Find("DebugImg");
-            this.debugImg = t.FindComponent<Image>("Img");
-            this.debugForwardImg = t.FindComponent<Image>("Img_Forward");
+            t = cached.Find("DebugImage");
+            this.imgDebug = t.FindComponent<Image>("Main");
+            this.imgDebugForward = t.FindComponent<Image>("Forward");
         }
 #endif  // UNITY_EDITOR
     }
