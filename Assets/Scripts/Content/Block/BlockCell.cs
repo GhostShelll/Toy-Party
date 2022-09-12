@@ -7,6 +7,7 @@ namespace com.jbg.content.block
 {
     public class BlockCell : ComponentEx
     {
+        [Header("Block Cell")]
         [SerializeField]
         Image bgImg;
         [SerializeField]

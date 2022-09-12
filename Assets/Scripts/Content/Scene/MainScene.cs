@@ -1,9 +1,5 @@
-using UnityEngine;
-
 using com.jbg.content.popup;
 using com.jbg.content.scene.view;
-using com.jbg.core;
-using com.jbg.core.manager;
 using com.jbg.core.scene;
 
 namespace com.jbg.content.scene
@@ -23,8 +19,6 @@ namespace com.jbg.content.scene
 
             this.sceneView = (MainView)this.SceneView;
 
-            //this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
-
             MainView.Params p = new();
             //p.checkAssetTxt = "**테이블 체크중";
             //p.downloadAssetTxt = "**{0} 테이블 다운로드중";
@@ -38,8 +32,6 @@ namespace com.jbg.content.scene
         protected override void OnClose()
         {
             base.OnClose();
-
-            //this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
         }
 
         protected override void OnBack()

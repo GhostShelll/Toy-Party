@@ -1,20 +1,13 @@
-using System.Collections.Generic;
-
 using UnityEngine;
-using UnityEngine.UI;
 
 using com.jbg.core;
 using com.jbg.core.scene;
+using com.jbg.content.block;
 
 namespace com.jbg.content.scene.view
 {
     public class MainView : SceneView
     {
-        public enum Event
-        {
-
-        };
-
         public class Params
         {
 
@@ -23,11 +16,15 @@ namespace com.jbg.content.scene.view
         private Params paramBuffer = null;
         public Params ParamBuffer { get { return this.paramBuffer; } }
 
-        //[Header("Main View")]
+        [Header("Main View")]
+        [SerializeField]
+        BlockManager blockManager;
 
         public void OnOpen(Params p)
         {
             this.paramBuffer = p;
+
+            this.blockManager.OnOpen();
         }
 
 #if UNITY_EDITOR
@@ -38,8 +35,8 @@ namespace com.jbg.content.scene.view
             Transform cached = this.CachedTransform.Find("Canvas/Padding");
             Transform t;
 
-            //t = cached.Find("BtnRefresh");
-            //this.refreshBtn = new ButtonComponent(t);
+            t = cached.Find("Center");
+            this.blockManager = t.FindComponent<BlockManager>("BlockManager");
         }
 #endif  // UNITY_EDITOR
     }
