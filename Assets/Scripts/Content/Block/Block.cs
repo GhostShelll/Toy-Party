@@ -13,6 +13,19 @@ namespace com.jbg.content.block
         [SerializeField]
         Image imgForward;
 
+        public void SetImage(Sprite mainImg, Sprite forwardImg)
+        {
+            this.imgMain.sprite = mainImg;
+
+            this.imgForward.enabled = forwardImg != null;
+            if (forwardImg != null)
+            {
+                this.imgForward.sprite = forwardImg;
+
+                // TODO[jbg] : 회전 시켜야함
+            }
+        }
+
 #if UNITY_EDITOR
         protected override void OnSetComponent()
         {
