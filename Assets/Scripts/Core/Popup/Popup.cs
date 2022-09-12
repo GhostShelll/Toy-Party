@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-using com.jbg.asset;
 using com.jbg.core.scene;
 using com.jbg.core.manager;
 

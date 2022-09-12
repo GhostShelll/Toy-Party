@@ -1,8 +1,5 @@
 using UnityEngine;
 
-using com.jbg.asset;
-using com.jbg.asset.control;
-using com.jbg.asset.data;
 using com.jbg.content.popup;
 using com.jbg.content.scene.view;
 using com.jbg.core;
@@ -17,8 +14,6 @@ namespace com.jbg.content.scene
 
         public enum STATE
         {
-            CheckAsset,
-            DownloadAsset,
             WaitDone,
         }
 
@@ -28,23 +23,23 @@ namespace com.jbg.content.scene
 
             this.sceneView = (MainView)this.SceneView;
 
-            this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
+            //this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
 
             MainView.Params p = new();
-            p.checkAssetTxt = "**테이블 체크중";
-            p.downloadAssetTxt = "**{0} 테이블 다운로드중";
-            p.refreshBtnTxt = "**테이블 갱신";
+            //p.checkAssetTxt = "**테이블 체크중";
+            //p.downloadAssetTxt = "**{0} 테이블 다운로드중";
+            //p.refreshBtnTxt = "**테이블 갱신";
 
             this.sceneView.OnOpen(p);
 
-            this.SetStateCheckAsset();
+            this.SetStateWaitDone();
         }
 
         protected override void OnClose()
         {
             base.OnClose();
 
-            this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
+            //this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
         }
 
         protected override void OnBack()
@@ -64,76 +59,9 @@ namespace com.jbg.content.scene
             });
         }
 
-        private void SetStateCheckAsset()
-        {
-            this.SetState((int)STATE.CheckAsset);
-
-            this.sceneView.SetStateCheckAsset();
-
-            // 에셋 체크 시작
-            Coroutine task = CoroutineManager.AddTask(TableVersionControl.CheckAsset());
-
-            this.AddUpdateFunc(() =>
-            {
-                if (TableVersionControl.CheckDone)
-                {
-                    // 에셋 체크 완료함
-                    if (task != null)
-                        CoroutineManager.RemoveTask(task);
-
-                    this.SetStateDownloadAsset();
-                }
-                else
-                {
-                    // 에셋 체크 중
-                    float currentProgress = TableVersionControl.GetRequestProgress();
-
-                    this.sceneView.UpdateCheckAsset(currentProgress);
-                }
-            });
-        }
-
-        private void SetStateDownloadAsset()
-        {
-            this.SetState((int)STATE.DownloadAsset);
-
-            // 에셋 로드 시작
-            Coroutine task = CoroutineManager.AddTask(AssetManager.DownloadAsset());
-
-            this.AddUpdateFunc(() =>
-            {
-                if (AssetManager.DownloadDone)
-                {
-                    // 에셋 로드 완료함
-                    if (task != null)
-                        CoroutineManager.RemoveTask(task);
-
-                    this.SetStateWaitDone();
-                }
-                else
-                {
-                    // 에셋 로드중
-                    string currentAsset = AssetManager.CurrentAsset;
-                    float currentProgress = AssetManager.GetRequestProgress();
-
-                    this.sceneView.UpdateDownloadAsset(currentAsset, currentProgress);
-                }
-            });
-        }
-
         private void SetStateWaitDone()
         {
             this.SetState((int)STATE.WaitDone);
-
-            this.sceneView.SetStateWaitDone();
-        }
-
-        private void OnClickRefreshAsset(int eventNum, object obj)
-        {
-            SoundManager.Inst.Play(SoundManager.SOUND_YES);
-
-            // 에셋 갱신 시작
-            this.SetStateCheckAsset();
         }
     }
 }

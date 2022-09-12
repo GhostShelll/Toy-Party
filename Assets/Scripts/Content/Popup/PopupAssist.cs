@@ -1,7 +1,5 @@
 using UnityEngine;
 
-using com.jbg.asset.control;
-using com.jbg.asset.data;
 using com.jbg.core.popup;
 
 namespace com.jbg.content.popup
