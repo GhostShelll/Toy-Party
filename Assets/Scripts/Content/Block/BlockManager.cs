@@ -20,8 +20,14 @@ namespace com.jbg.content.block
             Yellow,
         };
 
-        public enum Special
+        public enum Type
         {
+            Normal,
+            Pack,
+            Line6to12,
+            Line1to7,
+            Line3to9,
+            Line5to11,
             UFO,
             Turtle,
         };

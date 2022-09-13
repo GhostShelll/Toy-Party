@@ -13,16 +13,36 @@ namespace com.jbg.content.block
         [SerializeField]
         Image imgForward;
 
-        public void SetImage(Sprite mainImg, Sprite forwardImg)
+        private BlockManager.Color color;
+        public BlockManager.Color Color { get { return this.color; } }
+        private BlockManager.Type type;
+        public BlockManager.Type Type { get { return this.type; } }
+
+        public void SetImage(BlockManager.Color color, Sprite mainImg, BlockManager.Type type, Sprite forwardImg)
         {
+            this.color = color;
             this.imgMain.sprite = mainImg;
 
+            this.type = type;
             this.imgForward.enabled = forwardImg != null;
             if (forwardImg != null)
             {
                 this.imgForward.sprite = forwardImg;
 
-                // TODO[jbg] : 회전 시켜야함
+                // 앞 레이어의 이미지 회전
+                switch (this.type)
+                {
+                    case BlockManager.Type.Normal:
+                    case BlockManager.Type.Pack:
+                        break;
+                    case BlockManager.Type.Line6to12: this.imgForward.transform.localEulerAngles = Vector3.zero; break;
+                    case BlockManager.Type.Line1to7: this.imgForward.transform.localEulerAngles = new Vector3(0f, 0f, -45f); break;
+                    case BlockManager.Type.Line3to9: this.imgForward.transform.localEulerAngles = new Vector3(0f, 0f, 90f); break;
+                    case BlockManager.Type.Line5to11: this.imgForward.transform.localEulerAngles = new Vector3(0f, 0f, 45f); break;
+                    case BlockManager.Type.UFO:
+                    case BlockManager.Type.Turtle:
+                        break;
+                }
             }
         }
 
