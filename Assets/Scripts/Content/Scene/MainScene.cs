@@ -1,3 +1,5 @@
+using UnityEngine;
+
 using com.jbg.content.block;
 using com.jbg.content.popup;
 using com.jbg.core.scene;
@@ -9,12 +11,18 @@ namespace com.jbg.content.scene
         public enum STATE
         {
             Initialize,
+            CheckMatch,
+            DestroyMatched,
             ProcessDone,
         }
+
+        private float waitTime;
 
         protected override void OnOpen()
         {
             base.OnOpen();
+
+            this.waitTime = 0f;
 
             this.SetStateInitialize();
         }
@@ -47,7 +55,27 @@ namespace com.jbg.content.scene
 
             BlockManager.Instance.Initialize();
 
-            this.SetStateProcessDone();
+            this.SetStateCheckMatch();
+        }
+
+        private void SetStateCheckMatch()
+        {
+            this.SetState((int)STATE.CheckMatch);
+
+            BlockManager.Instance.CheckMatch();
+
+            this.waitTime = 0f;
+            this.AddUpdateFunc(() =>
+            {
+                this.waitTime += Time.deltaTime;
+                if (this.waitTime >= 0.5f)
+                    this.SetStateDestroyMatched();
+            });
+        }
+
+        private void SetStateDestroyMatched()
+        {
+            this.SetState((int)STATE.DestroyMatched);
         }
 
         private void SetStateProcessDone()

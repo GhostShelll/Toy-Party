@@ -11,44 +11,77 @@ namespace com.jbg.content.block
     {
         [Header("Block Cell")]
         [SerializeField]
+        Image imgBg;
+        [SerializeField]
         Image imgDebug;
         [SerializeField]
         Image imgDebugForward;
 
         private int colIndex;
         private int rowIndox;
+
+        private bool isEnable;
+        public bool IsEnable { get { return this.isEnable; } }
+
+        private BlockCell[] surroundCells;  // 0:좌상단, 1:상단, 2:우상단, 3:좌하단, 4:하단, 5:우하단
         private Block block;
 
-        private void Awake()
-        {
-#if LOG_DEBUG
-            this.imgDebug.transform.parent.gameObject.SetActive(true);
-#else
-            this.imgDebug.transform.parent.gameObject.SetActive(false);
-#endif  // LOG_DEBUG
-        }
+        private bool isChanged;
+        public bool IsChanged { get { return this.isChanged; } }
+
+        private bool isChecked;
+        public bool IsChecked { get { return this.isChecked; } }
 
         public string GetName()
         {
             return string.Format("{0}-{1}", this.colIndex, this.rowIndox);
         }
 
-        public void Initialize(int col, int row)
+        public void Initialize(int col, int row, bool isEnable)
         {
             this.colIndex = col;
             this.rowIndox = row;
+            this.isEnable = isEnable;
 
-            this.block = Manager.Instance.LoadBlock(this);
+            if (isEnable)
+            {
+                this.block = Manager.Instance.LoadBlock(this);
 
-            Manager.BlkColor color = Manager.Instance.GetRandomColor();
-            Sprite blkImg = Manager.Instance.GetNormalSprite(color);
+                this.isChanged = true;
+                this.isChecked = false;
 
-            this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
+                Manager.BlkColor color = Manager.Instance.GetRandomColor();
+                Sprite blkImg = Manager.Instance.GetNormalSprite(color);
 
+                this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
+
+                this.imgBg.canvasRenderer.SetAlpha(1f);
 #if LOG_DEBUG
-            this.imgDebug.sprite = blkImg;
-            this.imgDebugForward.enabled = false;
+                this.imgDebug.enabled = true;
+                this.imgDebug.sprite = blkImg;
+                this.imgDebugForward.enabled = false;
+#else   // LOG_DEBUG
+                this.imgDebug.enabled = false;
+                this.imgDebugForward.enabled = false;
 #endif  // LOG_DEBUG
+            }
+            else
+            {
+                this.block = null;
+
+                this.isChanged = false;
+                this.isChecked = true;
+
+                this.imgBg.canvasRenderer.SetAlpha(0.2f);
+
+                this.imgDebug.enabled = false;
+                this.imgDebugForward.enabled = false;
+            }
+        }
+
+        public void CheckMatch()
+        {
+            this.isChecked = true;
         }
 
         public void SetBlock(Manager.BlkColor color, Sprite mainImg, Manager.BlkType type, Sprite forwardImg)
@@ -90,6 +123,9 @@ namespace com.jbg.content.block
 
             Transform cached = this.CachedTransform;
             Transform t;
+
+            t = cached.Find("Bg");
+            this.imgBg = t.GetComponent<Image>();
 
             t = cached.Find("DebugImage");
             this.imgDebug = t.FindComponent<Image>("Main");

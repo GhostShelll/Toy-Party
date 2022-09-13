@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace com.jbg.content.block
     {
         private const string BLOCK_PREFAB_PATH = "Prefabs/Blocks/Block";
         private const string BLOCK_IMAGE_PATH = "Sprites/Blocks/";
+
+        private const string TEST_MAP_INFO = "1-6,1-7,1-8,2-5,2-6,2-7,2-8,3-5,3-6,3-7,3-8,3-9,4-4,4-5,4-6,4-7,4-8,4-9,5-5,5-6,5-7,5-8,5-9,6-5,6-6,6-7,6-8,7-6,7-7,7-8";
 
         public static BlockManager Instance { get; private set; }
 
@@ -160,6 +163,8 @@ namespace com.jbg.content.block
         {
             Transform cached = this.CachedTransform;
 
+            List<string> mapInfo = BlockManager.TEST_MAP_INFO.Split(',').ToList();
+
             this.blockMap = new BlockCell[cached.childCount][];
             for (int i = 0; i < cached.childCount; i++)
             {
@@ -169,8 +174,30 @@ namespace com.jbg.content.block
 
                 for (int j = 0; j < child.childCount; j++)
                 {
+                    string cellName = string.Format("{0}-{1}", i, j);
+                    bool isEnableCell = mapInfo.Contains(cellName);
+
                     this.blockMap[i][j] = child.GetChild(j).FindComponent<BlockCell>();
-                    this.blockMap[i][j].Initialize(i, j);
+                    this.blockMap[i][j].Initialize(i, j, isEnableCell);
+                }
+            }
+        }
+
+        public void CheckMatch()
+        {
+            for (int i = 0; i < this.blockMap.Length; i++)
+            {
+                BlockCell[] columns = this.blockMap[i];
+
+                for (int j = 0; j < columns.Length; j++)
+                {
+                    BlockCell cell = columns[j];
+                    if (cell.IsChanged == false)
+                        continue;
+                    if (cell.IsChecked)
+                        continue;
+
+                    cell.CheckMatch();
                 }
             }
         }
