@@ -9,7 +9,7 @@ namespace com.jbg.content.scene
         public enum STATE
         {
             Initialize,
-            WaitDone,
+            ProcessDone,
         }
 
         protected override void OnOpen()
@@ -47,12 +47,12 @@ namespace com.jbg.content.scene
 
             BlockManager.Instance.Initialize();
 
-            this.SetStateWaitDone();
+            this.SetStateProcessDone();
         }
 
-        private void SetStateWaitDone()
+        private void SetStateProcessDone()
         {
-            this.SetState((int)STATE.WaitDone);
+            this.SetState((int)STATE.ProcessDone);
         }
     }
 }
