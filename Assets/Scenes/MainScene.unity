@@ -275,7 +275,6 @@ MonoBehaviour:
   cachedRectTransform: {fileID: 0}
   canvasArr:
   - {fileID: 676897955}
-  blockManager: {fileID: 661419593}
 --- !u!1001 &114998841
 PrefabInstance:
   m_ObjectHideFlags: 0

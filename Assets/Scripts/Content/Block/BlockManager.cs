@@ -8,12 +8,14 @@ namespace com.jbg.content.block
 {
     public class BlockManager : ComponentEx
     {
-        private const string BLOCK_PREFAB_PATH = "Prefabs/Blocks/";
+        private const string BLOCK_PREFAB_PATH = "Prefabs/Blocks/Block";
         private const string BLOCK_IMAGE_PATH = "Sprites/Blocks/";
 
-        public enum Color
+        public static BlockManager Instance { get; private set; }
+
+        public enum BlkColor
         {
-            Blue,
+            Blue = 0,
             Green,
             Orange,
             Purple,
@@ -21,9 +23,9 @@ namespace com.jbg.content.block
             Yellow,
         };
 
-        public enum Type
+        public enum BlkType
         {
-            Normal,
+            Normal = 0,
             Pack,
             Line6to12,
             Line1to7,
@@ -46,6 +48,114 @@ namespace com.jbg.content.block
 
         private BlockCell[][] blockMap;
 
+        private void Awake()
+        {
+            BlockManager.Instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            BlockManager.Instance = null;
+        }
+
+        public Block LoadBlock(BlockCell cell)
+        {
+            string cellName = cell.GetName();
+            DebugEx.Log("BLOCK_LOAD:" + cellName);
+
+            if (this == null)
+            {
+                DebugEx.Log("BLOCK_LOAD_FAILED:" + cellName + ", MANAGER_IS_NULL");
+                return null;
+            }
+
+            string blockPath = BlockManager.BLOCK_PREFAB_PATH;
+
+            Block prefab = Resources.Load<Block>(blockPath);
+            if (prefab == null)
+            {
+                DebugEx.Log("BLOCK_LOAD_FAILED:" + cellName + ", PATH:" + blockPath + ", RESOURCES_LOAD_FAILED");
+                return null;
+            }
+
+            GameObject blockObj = GameObject.Instantiate(prefab.gameObject);
+            if (blockObj == null)
+            {
+                DebugEx.Log("BLOCK_LOAD_FAILED:" + cellName + ", PATH:" + blockPath + ", GAMEOBJECT_INSTANTIATE_FAILED");
+
+                Object.Destroy(prefab);
+                return null;
+            }
+
+            Block block = blockObj.GetComponent<Block>();
+            if (block == null)
+            {
+                DebugEx.Log("BLOCK_LOAD_FAILED:" + cellName + ", PATH:" + blockPath + ", GETCOMPONENT_FAILED");
+
+                GameObject.Destroy(blockObj);
+                Object.Destroy(prefab);
+                return null;
+            }
+
+            RectTransform trans = block.CachedRectTransform;
+            RectTransform transPrefab = prefab.CachedRectTransform;
+            trans.SetParent(cell.transform);
+            trans.name = cellName;
+            trans.anchoredPosition = transPrefab.anchoredPosition;
+            trans.localPosition = transPrefab.localPosition;
+            trans.localScale = transPrefab.localScale;
+            trans.offsetMax = transPrefab.offsetMax;
+            trans.offsetMin = transPrefab.offsetMin;
+
+            return block;
+        }
+
+        public BlkColor GetRandomColor()
+        {
+            System.Random random = new();
+
+            System.Array colorArray = System.Enum.GetValues(typeof(BlkColor));
+            BlkColor result = (BlkColor)colorArray.GetValue(random.Next(colorArray.Length));
+
+            return result;
+        }
+
+        public Sprite GetNormalSprite(BlkColor color)
+        {
+            if (this.normalBlockSprites == null)
+                return null;
+
+            int index = (int)color;
+            if (index < 0 || this.normalBlockSprites.Count <= index)
+                return null;
+
+            return this.normalBlockSprites[(int)color];
+        }
+
+        public Sprite GetPackSprite(BlkColor color)
+        {
+            if (this.packBlockSprites == null)
+                return null;
+
+            int index = (int)color;
+            if (index < 0 || this.packBlockSprites.Count <= index)
+                return null;
+
+            return this.packBlockSprites[(int)color];
+        }
+
+        public Sprite GetLineSprite(BlkColor color)
+        {
+            if (this.blockLineSprites == null)
+                return null;
+
+            int index = (int)color;
+            if (index < 0 || this.blockLineSprites.Count <= index)
+                return null;
+
+            return this.blockLineSprites[(int)color];
+        }
+
         public void Initialize()
         {
             Transform cached = this.CachedTransform;
@@ -58,7 +168,10 @@ namespace com.jbg.content.block
                 this.blockMap[i] = new BlockCell[child.childCount];
 
                 for (int j = 0; j < child.childCount; j++)
+                {
                     this.blockMap[i][j] = child.GetChild(j).FindComponent<BlockCell>();
+                    this.blockMap[i][j].Initialize(i, j);
+                }
             }
         }
 
@@ -66,9 +179,6 @@ namespace com.jbg.content.block
         protected override void OnSetComponent()
         {
             base.OnSetComponent();
-
-            //Transform cached = this.CachedTransform;
-            //Transform t;
 
             this.normalBlockSprites = new();
             this.normalBlockSprites.Add(Resources.Load<Sprite>(BlockManager.BLOCK_IMAGE_PATH + "blk_b"));

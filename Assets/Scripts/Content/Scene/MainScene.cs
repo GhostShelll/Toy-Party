@@ -1,15 +1,14 @@
+using com.jbg.content.block;
 using com.jbg.content.popup;
-using com.jbg.content.scene.view;
 using com.jbg.core.scene;
 
 namespace com.jbg.content.scene
 {
     public class MainScene : SceneEx
     {
-        private MainView sceneView;
-
         public enum STATE
         {
+            Initial,
             WaitDone,
         }
 
@@ -17,16 +16,7 @@ namespace com.jbg.content.scene
         {
             base.OnOpen();
 
-            this.sceneView = (MainView)this.SceneView;
-
-            MainView.Params p = new();
-            //p.checkAssetTxt = "**테이블 체크중";
-            //p.downloadAssetTxt = "**{0} 테이블 다운로드중";
-            //p.refreshBtnTxt = "**테이블 갱신";
-
-            this.sceneView.OnOpen(p);
-
-            this.SetStateWaitDone();
+            this.SetStateInitial();
         }
 
         protected override void OnClose()
@@ -49,6 +39,15 @@ namespace com.jbg.content.scene
                     Application.Quit();
 #endif  // UNITY_EDITOR
             });
+        }
+
+        private void SetStateInitial()
+        {
+            this.SetState((int)STATE.Initial);
+
+            BlockManager.Instance.Initialize();
+
+            this.SetStateWaitDone();
         }
 
         private void SetStateWaitDone()
