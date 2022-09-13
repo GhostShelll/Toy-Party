@@ -11,8 +11,6 @@ namespace com.jbg.content.block
     {
         [Header("Block Cell")]
         [SerializeField]
-        Image imgBg;
-        [SerializeField]
         Image imgDebug;
         [SerializeField]
         Image imgDebugForward;
@@ -92,9 +90,6 @@ namespace com.jbg.content.block
 
             Transform cached = this.CachedTransform;
             Transform t;
-
-            t = cached.Find("Bg");
-            this.imgBg = t.GetComponent<Image>();
 
             t = cached.Find("DebugImage");
             this.imgDebug = t.FindComponent<Image>("Main");
