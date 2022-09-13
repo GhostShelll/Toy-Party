@@ -8,7 +8,7 @@ namespace com.jbg.content.scene
     {
         public enum STATE
         {
-            Initial,
+            Initialize,
             WaitDone,
         }
 
@@ -16,7 +16,7 @@ namespace com.jbg.content.scene
         {
             base.OnOpen();
 
-            this.SetStateInitial();
+            this.SetStateInitialize();
         }
 
         protected override void OnClose()
@@ -41,9 +41,9 @@ namespace com.jbg.content.scene
             });
         }
 
-        private void SetStateInitial()
+        private void SetStateInitialize()
         {
-            this.SetState((int)STATE.Initial);
+            this.SetState((int)STATE.Initialize);
 
             BlockManager.Instance.Initialize();
 
