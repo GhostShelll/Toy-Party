@@ -37,6 +37,11 @@ namespace com.jbg.content.block
             return string.Format("{0}-{1}", this.colIndex, this.rowIndox);
         }
 
+        public void SetSurroundCells(BlockCell[] surroundCells)
+        {
+            this.surroundCells = surroundCells;
+        }
+
         public void Initialize(int col, int row, bool isEnable)
         {
             this.colIndex = col;

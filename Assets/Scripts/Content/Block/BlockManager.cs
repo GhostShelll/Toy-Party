@@ -181,6 +181,44 @@ namespace com.jbg.content.block
                     this.blockMap[i][j].Initialize(i, j, isEnableCell);
                 }
             }
+
+            for (int i = 0; i < this.blockMap.Length; i++)
+            {
+                BlockCell[] rows = this.blockMap[i];
+
+                bool firstCol = i == 0;
+                bool lastCol = i == this.blockMap.Length - 1;
+
+                for (int j = 0; j < rows.Length; j++)
+                {
+                    BlockCell cell = rows[j];
+                    BlockCell[] surroundCells = new BlockCell[6];
+
+                    bool firstRow = j == 0;
+                    bool lastRow = j == rows.Length - 1;
+
+                    if (i % 2 == 0)
+                    {
+                        surroundCells[0] = firstCol ? null : this.blockMap[i - 1][j];
+                        surroundCells[1] = firstRow ? null : this.blockMap[i][j - 1];
+                        surroundCells[2] = lastCol ? null : this.blockMap[i + 1][j];
+                        surroundCells[3] = firstCol ? null : this.blockMap[i - 1][j + 1];
+                        surroundCells[4] = lastRow ? null : this.blockMap[i][j + 1];
+                        surroundCells[5] = lastCol ? null : this.blockMap[i + 1][j + 1];
+                    }
+                    else
+                    {
+                        surroundCells[0] = firstRow ? null : this.blockMap[i - 1][j - 1];
+                        surroundCells[1] = firstRow ? null : this.blockMap[i][j - 1];
+                        surroundCells[2] = firstRow ? null : this.blockMap[i + 1][j - 1];
+                        surroundCells[3] = lastRow ? null : this.blockMap[i - 1][j];
+                        surroundCells[4] = lastRow ? null : this.blockMap[i][j + 1];
+                        surroundCells[5] = lastRow ? null : this.blockMap[i + 1][j];
+                    }
+
+                    cell.SetSurroundCells(surroundCells);
+                }
+            }
         }
 
         public void CheckMatch()
