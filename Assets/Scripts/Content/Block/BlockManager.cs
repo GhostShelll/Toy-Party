@@ -232,12 +232,29 @@ namespace com.jbg.content.block
                     BlockCell cell = columns[j];
                     if (cell.IsEnable == false)
                         continue;
-                    if (cell.IsChanged == false)
-                        continue;
                     if (cell.IsChecked)
                         continue;
 
                     cell.CheckMatch();
+                }
+            }
+        }
+
+        public void DestroyMatched()
+        {
+            for (int i = 0; i < this.blockMap.Length; i++)
+            {
+                BlockCell[] columns = this.blockMap[i];
+
+                for (int j = 0; j < columns.Length; j++)
+                {
+                    BlockCell cell = columns[j];
+                    if (cell.IsEnable == false)
+                        continue;
+                    if (cell.IsNeedDestroy == false)
+                        continue;
+
+                    cell.DestroyMatched();
                 }
             }
         }

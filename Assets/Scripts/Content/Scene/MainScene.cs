@@ -76,6 +76,16 @@ namespace com.jbg.content.scene
         private void SetStateDestroyMatched()
         {
             this.SetState((int)STATE.DestroyMatched);
+
+            BlockManager.Instance.DestroyMatched();
+
+            this.waitTime = 0f;
+            this.AddUpdateFunc(() =>
+            {
+                this.waitTime += Time.deltaTime;
+                if (this.waitTime >= 0.5f)
+                    this.SetStateProcessDone();
+            });
         }
 
         private void SetStateProcessDone()

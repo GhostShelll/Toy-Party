@@ -23,18 +23,28 @@ namespace com.jbg.content.block
         private bool isEnable;
         public bool IsEnable { get { return this.isEnable; } }
 
-        private BlockCell[] surroundCells;  // 0:좌상단, 1:상단, 2:우상단, 3:좌하단, 4:하단, 5:우하단
-        private Block block;
-
-        private bool isChanged;
-        public bool IsChanged { get { return this.isChanged; } }
-
         private bool isChecked;
         public bool IsChecked { get { return this.isChecked; } }
+
+        private bool isNeedDestroy;
+        public bool IsNeedDestroy { get { return this.isNeedDestroy; } set { this.isNeedDestroy = value; } }
+
+        private Block block;
+        public Block Block { get { return this.block; } }
+
+        private BlockCell[] surroundCells;  // 0:좌상단, 1:상단, 2:우상단, 3:좌하단, 4:하단, 5:우하단
 
         public string GetName()
         {
             return string.Format("{0}-{1}", this.colIndex, this.rowIndox);
+        }
+
+        public bool IsSameColor(BlockManager.BlkColor color)
+        {
+            if (this.block == null)
+                return false;
+
+            return this.block.Color == color;
         }
 
         public void SetSurroundCells(BlockCell[] surroundCells)
@@ -47,13 +57,12 @@ namespace com.jbg.content.block
             this.colIndex = col;
             this.rowIndox = row;
             this.isEnable = isEnable;
+            this.isChecked = false;
+            this.isNeedDestroy = false;
 
             if (isEnable)
             {
                 this.block = Manager.Instance.LoadBlock(this);
-
-                this.isChanged = true;
-                this.isChecked = false;
 
                 Manager.BlkColor color = Manager.Instance.GetRandomColor();
                 Sprite blkImg = Manager.Instance.GetNormalSprite(color);
@@ -74,9 +83,6 @@ namespace com.jbg.content.block
             {
                 this.block = null;
 
-                this.isChanged = false;
-                this.isChecked = true;
-
                 this.imgBg.canvasRenderer.SetAlpha(0.2f);
 
                 this.imgDebug.enabled = false;
@@ -86,7 +92,59 @@ namespace com.jbg.content.block
 
         public void CheckMatch()
         {
+            Manager.BlkColor thisColor = this.block.Color;
+
             this.isChecked = true;
+
+            // 현재의 Cell을 중점으로 두고 세 방향으로 검사하여 3개가 매칭되었는지 검사
+            BlockCell cellLT = this.surroundCells[0];
+            BlockCell cellT = this.surroundCells[1];
+            BlockCell cellRT = this.surroundCells[2];
+            BlockCell cellLB = this.surroundCells[3];
+            BlockCell cellB = this.surroundCells[4];
+            BlockCell cellRB = this.surroundCells[5];
+
+            // 북서-남동 방향 매칭 검사
+            if (cellLT != null && cellRB != null)
+            {
+                bool isMatch = cellLT.IsSameColor(thisColor) && cellRB.IsSameColor(thisColor);
+                if (isMatch)
+                    cellLT.IsNeedDestroy = cellRB.IsNeedDestroy = true;
+
+                this.isNeedDestroy |= isMatch;
+            }
+
+            // 북-남 방향 매칭 검사
+            if (cellT != null && cellB != null)
+            {
+                bool isMatch = cellT.IsSameColor(thisColor) && cellB.IsSameColor(thisColor);
+                if (isMatch)
+                    cellT.IsNeedDestroy = cellB.IsNeedDestroy = true;
+
+                this.isNeedDestroy |= isMatch;
+            }
+
+            // 북동-남서 방향 매칭 검사
+            if (cellRT != null && cellLB != null)
+            {
+                bool isMatch = cellRT.IsSameColor(thisColor) && cellLB.IsSameColor(thisColor);
+                if (isMatch)
+                    cellRT.IsNeedDestroy = cellLB.IsNeedDestroy = true;
+
+                this.isNeedDestroy |= isMatch;
+            }
+        }
+
+        public void DestroyMatched()
+        {
+            // 블럭 파괴하기
+            if (this.block != null)
+                this.block.DoDestroy();
+
+            this.block = null;
+
+            this.imgDebug.enabled = false;
+            this.imgDebugForward.enabled = false;
         }
 
         public void SetBlock(Manager.BlkColor color, Sprite mainImg, Manager.BlkType type, Sprite forwardImg)

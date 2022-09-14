@@ -18,6 +18,8 @@ namespace com.jbg.content.block
         private BlockManager.BlkType type;
         public BlockManager.BlkType Type { get { return this.type; } }
 
+        private bool isDestroy;
+
         public void Initialize(BlockManager.BlkColor color, BlockManager.BlkType type, Sprite mainImg)
         {
             this.imgMain.sprite = mainImg;
@@ -25,6 +27,16 @@ namespace com.jbg.content.block
 
             this.color = color;
             this.type = type;
+            this.isDestroy = false;
+        }
+
+        public void DoDestroy()
+        {
+            if (this.isDestroy)
+                return;
+            this.isDestroy = true;
+
+            GameObject.Destroy(this.gameObject);
         }
 
 #if UNITY_EDITOR
