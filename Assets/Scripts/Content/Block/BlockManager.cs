@@ -230,6 +230,8 @@ namespace com.jbg.content.block
                 for (int j = 0; j < columns.Length; j++)
                 {
                     BlockCell cell = columns[j];
+                    if (cell.IsEnable == false)
+                        continue;
                     if (cell.IsChanged == false)
                         continue;
                     if (cell.IsChecked)
