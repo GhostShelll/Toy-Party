@@ -2,12 +2,15 @@ using UnityEngine;
 
 using com.jbg.content.block;
 using com.jbg.content.popup;
+using com.jbg.content.scene.view;
 using com.jbg.core.scene;
 
 namespace com.jbg.content.scene
 {
     public class MainScene : SceneEx
     {
+        private MainView sceneView;
+
         public enum STATE
         {
             Initialize,
@@ -22,6 +25,17 @@ namespace com.jbg.content.scene
         protected override void OnOpen()
         {
             base.OnOpen();
+
+            this.sceneView = (MainView)this.SceneView;
+
+            MainView.Params p = new();
+            p.initializeTxt = "**초기화 중";
+            p.checkMatchTxt = "**매칭 검사 중";
+            p.destroyMatchedTxt = "**매칭된 블럭 삭제 중";
+            p.processBlockMoveTxt = "**블럭 이동 중";
+            p.processDoneTxt = "**입력 대기 중";
+
+            this.sceneView.OnOpen(p);
 
             this.waitTime = 0f;
 
@@ -54,6 +68,8 @@ namespace com.jbg.content.scene
         {
             this.SetState((int)STATE.Initialize);
 
+            this.sceneView.SetStateInitialize();
+
             BlockManager.Instance.Initialize();
 
             this.SetStateCheckMatch();
@@ -62,6 +78,8 @@ namespace com.jbg.content.scene
         private void SetStateCheckMatch()
         {
             this.SetState((int)STATE.CheckMatch);
+
+            this.sceneView.SetStateCheckMatch();
 
             BlockManager.Instance.CheckMatch();
 
@@ -77,6 +95,8 @@ namespace com.jbg.content.scene
         private void SetStateDestroyMatched()
         {
             this.SetState((int)STATE.DestroyMatched);
+
+            this.sceneView.SetStateDestroyMatched();
 
             bool cellDestroyed = BlockManager.Instance.DestroyMatched();
 
@@ -100,6 +120,8 @@ namespace com.jbg.content.scene
         {
             this.SetState((int)STATE.ProcessBlockMove);
 
+            this.sceneView.SetStateProcessBlockMove();
+
             bool isMoved = BlockManager.Instance.ProcessBlockMove();
 
             if (isMoved)
@@ -121,6 +143,8 @@ namespace com.jbg.content.scene
         private void SetStateProcessDone()
         {
             this.SetState((int)STATE.ProcessDone);
+
+            this.sceneView.SetStateProcessDone();
         }
     }
 }
