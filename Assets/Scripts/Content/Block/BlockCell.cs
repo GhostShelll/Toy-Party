@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,6 +37,27 @@ namespace com.jbg.content.block
         public string GetName()
         {
             return string.Format("{0}-{1}", this.colIndex, this.rowIndox);
+        }
+
+        public void SetBlock(Block block)
+        {
+            this.block = block;
+
+            Transform trans = this.block.transform;
+
+            trans.SetParent(this.transform);
+            trans.name = this.GetName();
+            trans.localPosition = Vector3.zero;
+        }
+
+        public void SetNewBlock()
+        {
+            this.block = Manager.Instance.LoadBlock(this);
+
+            Manager.BlkColor color = Manager.Instance.GetRandomColor();
+            Sprite blkImg = Manager.Instance.GetNormalSprite(color);
+
+            this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
         }
 
         public bool IsSameColor(BlockManager.BlkColor color)
@@ -83,12 +106,7 @@ namespace com.jbg.content.block
 
             if (isEnable)
             {
-                this.block = Manager.Instance.LoadBlock(this);
-
-                Manager.BlkColor color = Manager.Instance.GetRandomColor();
-                Sprite blkImg = Manager.Instance.GetNormalSprite(color);
-
-                this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
+                this.SetNewBlock();
 
                 this.imgBg.canvasRenderer.SetAlpha(1f);
             }
@@ -145,7 +163,7 @@ namespace com.jbg.content.block
             }
         }
 
-        public void DestroyMatched()
+        public void DestroyBlock()
         {
             // 블럭 파괴하기
             if (this.block != null)
@@ -189,12 +207,7 @@ namespace com.jbg.content.block
 
             if (nonTopCell)
             {
-                this.block = Manager.Instance.LoadBlock(this);
-
-                Manager.BlkColor color = Manager.Instance.GetRandomColor();
-                Sprite blkImg = Manager.Instance.GetNormalSprite(color);
-
-                this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
+                this.SetNewBlock();
 
                 return true;
             }
@@ -202,15 +215,47 @@ namespace com.jbg.content.block
             return false;
         }
 
-        public void SetBlock(Block block)
+        public bool CheckMatchPossible()
         {
-            this.block = block;
+            Manager.BlkColor thisColor = this.block.Color;
 
-            Transform trans = this.block.transform;
+            List<int> matchIndex = new();
+            for (int i = 0; i < this.surroundCells.Length; i++)
+            {
+                BlockCell cell = this.surroundCells[i];
+                if (cell == null)
+                    continue;
+                if (cell.IsEnable == false || cell.IsEmpty)
+                    continue;
 
-            trans.SetParent(this.transform);
-            trans.name = this.GetName();
-            trans.localPosition = Vector3.zero;
+                if (cell.IsSameColor(thisColor))
+                    matchIndex.Add(i);
+            }
+
+            if (matchIndex.Count > 2)   // 주위의 같은 색 블럭이 3개 이상이면 모든 상황 매칭 가능함
+                return true;
+
+            if (matchIndex.Count == 2)
+            {
+                // 중앙 블럭 기준으로 주위의 같은색 블럭은 2개뿐 일 때
+                // 총 3개의 블럭이 삼각형 모양으로 뭉친 경우 매칭 불가함
+                if (matchIndex.Contains(0) && matchIndex.Contains(1))       // 북서-북
+                    return false;
+                else if (matchIndex.Contains(1) && matchIndex.Contains(2))  // 북-북동
+                    return false;
+                else if (matchIndex.Contains(2) && matchIndex.Contains(5))  // 북동-남동
+                    return false;
+                else if (matchIndex.Contains(5) && matchIndex.Contains(4))  // 남동-남
+                    return false;
+                else if (matchIndex.Contains(4) && matchIndex.Contains(3))  // 남-남서
+                    return false;
+                else if (matchIndex.Contains(3) && matchIndex.Contains(0))  // 남서-북서
+                    return false;
+                else
+                    return true;    // 위 예외를 제외한 모든 상황은 매칭 가능함
+            }
+
+            return false;
         }
 
         public void OnClickBlockCell()
