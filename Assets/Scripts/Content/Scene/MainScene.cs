@@ -18,10 +18,12 @@ namespace com.jbg.content.scene
             CheckMatch,
             DestroyMatched,
             ProcessBlockMove,
+            ProcessBlockSwap,
             ProcessDone,
         }
 
         private float waitTime;
+        private bool blockSwapOn;
 
         protected override void OnOpen()
         {
@@ -34,11 +36,13 @@ namespace com.jbg.content.scene
             p.checkMatchTxt = "**매칭 검사 중";
             p.destroyMatchedTxt = "**매칭된 블럭 삭제 중";
             p.processBlockMoveTxt = "**블럭 이동 중";
+            p.processBlockSwapTxt = "**선택된 블럭 위치 변경 중";
             p.processDoneTxt = "**입력 대기 중";
 
             this.sceneView.OnOpen(p);
 
             this.waitTime = 0f;
+            this.blockSwapOn = false;
 
             this.SetStateInitialize();
         }
@@ -103,6 +107,13 @@ namespace com.jbg.content.scene
 
             if (cellDestroyed)
             {
+                if (this.blockSwapOn)
+                {
+                    this.blockSwapOn = false;
+
+                    BlockManager.Instance.DisableBlockSwap();
+                }
+
                 this.waitTime = 0f;
                 this.AddUpdateFunc(() =>
                 {
@@ -113,6 +124,14 @@ namespace com.jbg.content.scene
             }
             else
             {
+                if (this.blockSwapOn)
+                {
+                    this.blockSwapOn = false;
+
+                    BlockManager.Instance.ProcessBlockSwap();
+                    BlockManager.Instance.DisableBlockSwap();
+                }
+
                 this.SetStateProcessDone();
             }
         }
@@ -141,6 +160,23 @@ namespace com.jbg.content.scene
             }
         }
 
+        private void SetStateProcessBlockSwap()
+        {
+            this.SetState((int)STATE.ProcessBlockSwap);
+
+            this.sceneView.SetStateProcessBlockSwap();
+
+            this.blockSwapOn = BlockManager.Instance.ProcessBlockSwap();
+
+            this.waitTime = 0f;
+            this.AddUpdateFunc(() =>
+            {
+                this.waitTime += Time.deltaTime;
+                if (this.waitTime >= 1f)
+                    this.SetStateCheckMatch();
+            });
+        }
+
         private void SetStateProcessDone()
         {
             this.SetState((int)STATE.ProcessDone);
@@ -155,7 +191,9 @@ namespace com.jbg.content.scene
 
             SoundManager.Inst.Play(SoundManager.SOUND_YES);
 
-            Debug.Log(cellName);
+            bool cellSwapReady = BlockManager.Instance.OnClickBlockCell(cellName);
+            if (cellSwapReady)
+                this.SetStateProcessBlockSwap();
         }
     }
 }

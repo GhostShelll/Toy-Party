@@ -50,6 +50,9 @@ namespace com.jbg.content.block
         List<Sprite> specialBlockSprites;
 
         private BlockCell[][] blockMap;
+        private Dictionary<string, BlockCell> blockDic;
+        private BlockCell highlightCell1;
+        private BlockCell highlightCell2;
 
         private void Awake()
         {
@@ -166,6 +169,10 @@ namespace com.jbg.content.block
             List<string> mapInfo = BlockManager.TEST_MAP_INFO.Split(',').ToList();
 
             this.blockMap = new BlockCell[cached.childCount][];
+            this.blockDic = new();
+            this.highlightCell1 = null;
+            this.highlightCell2 = null;
+
             for (int i = 0; i < cached.childCount; i++)
             {
                 Transform child = cached.GetChild(i);
@@ -179,6 +186,8 @@ namespace com.jbg.content.block
 
                     this.blockMap[i][j] = child.GetChild(j).FindComponent<BlockCell>();
                     this.blockMap[i][j].Initialize(i, j, isEnableCell, onClickCallback);
+
+                    this.blockDic.Add(cellName, this.blockMap[i][j]);
                 }
             }
 
@@ -289,6 +298,70 @@ namespace com.jbg.content.block
             }
 
             return isMoved;
+        }
+
+        public bool ProcessBlockSwap()
+        {
+            bool cellIsSwap = false;
+
+            if (this.highlightCell1 != null && this.highlightCell2 != null)
+            {
+                Block block1 = this.highlightCell1.Block;
+                Block block2 = this.highlightCell2.Block;
+
+                this.highlightCell1.SetBlock(block2);
+                this.highlightCell2.SetBlock(block1);
+
+                cellIsSwap = true;
+            }
+
+            return cellIsSwap;
+        }
+
+        public void DisableBlockSwap()
+        {
+            if (this.highlightCell1 != null)
+                this.highlightCell1.SetHighlight(false);
+            this.highlightCell1 = null;
+
+            if (this.highlightCell2 != null)
+                this.highlightCell2.SetHighlight(false);
+            this.highlightCell2 = null;
+        }
+
+        public bool OnClickBlockCell(string cellName)
+        {
+            if (this.blockDic.ContainsKey(cellName) == false)
+                return false;
+
+            BlockCell cell = this.blockDic[cellName];
+            if (cell.IsEnable == false)
+                return false;
+
+            if (this.highlightCell1 == null)
+            {
+                this.highlightCell1 = cell;
+                this.highlightCell1.SetHighlight(true);
+            }
+            else
+            {
+                bool isSurroundCell = this.highlightCell1.IsSurroundCell(cellName);
+                if (this.highlightCell1.GetName() == cellName || isSurroundCell == false)
+                {
+                    this.highlightCell1.SetHighlight(false);
+                    this.highlightCell1 = null;
+                    return false;
+                }
+
+                if (isSurroundCell)
+                {
+                    this.highlightCell2 = cell;
+                    this.highlightCell2.SetHighlight(true);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
 #if UNITY_EDITOR

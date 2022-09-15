@@ -14,6 +14,7 @@ namespace com.jbg.content.scene.view
             public string checkMatchTxt;
             public string destroyMatchedTxt;
             public string processBlockMoveTxt;
+            public string processBlockSwapTxt;
             public string processDoneTxt;
         }
 
@@ -55,6 +56,13 @@ namespace com.jbg.content.scene.view
             Params p = this.paramBuffer;
 
             this.stateTxt.text = p.processBlockMoveTxt;
+        }
+
+        public void SetStateProcessBlockSwap()
+        {
+            Params p = this.paramBuffer;
+
+            this.stateTxt.text = p.processBlockSwapTxt;
         }
 
         public void SetStateProcessDone()

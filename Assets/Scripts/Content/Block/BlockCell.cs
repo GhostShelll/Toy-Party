@@ -12,6 +12,8 @@ namespace com.jbg.content.block
         [Header("Block Cell")]
         [SerializeField]
         Image imgBg;
+        [SerializeField]
+        Image imgHighlight;
 
         private int colIndex;
         private int rowIndox;
@@ -48,6 +50,29 @@ namespace com.jbg.content.block
             this.surroundCells = surroundCells;
         }
 
+        public bool IsSurroundCell(string cellName)
+        {
+            bool result = false;
+
+            for (int i = 0; i < this.surroundCells.Length; i++)
+            {
+                BlockCell cell = this.surroundCells[i];
+                if (cell == null || cell.IsEnable == false)
+                    continue;
+
+                result = cell.GetName().Equals(cellName);
+                if (result)
+                    break;
+            }
+
+            return result;
+        }
+
+        public void SetHighlight(bool isEnable)
+        {
+            this.imgHighlight.enabled = isEnable;
+        }
+
         public void Initialize(int col, int row, bool isEnable, System.Action<string> onClickCallback)
         {
             this.colIndex = col;
@@ -73,6 +98,8 @@ namespace com.jbg.content.block
 
                 this.imgBg.canvasRenderer.SetAlpha(0.2f);
             }
+
+            this.imgHighlight.enabled = false;
         }
 
         public void CheckMatch()
@@ -201,6 +228,9 @@ namespace com.jbg.content.block
 
             t = cached.Find("Bg");
             this.imgBg = t.GetComponent<Image>();
+
+            t = cached.Find("Highlight");
+            this.imgHighlight = t.GetComponent<Image>();
         }
 #endif  // UNITY_EDITOR
     }
