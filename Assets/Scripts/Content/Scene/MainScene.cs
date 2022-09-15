@@ -10,6 +10,8 @@ namespace com.jbg.content.scene
 {
     public class MainScene : SceneEx
     {
+        private const float WAIT_TIME = 1f;
+
         private MainView sceneView;
 
         public enum STATE
@@ -92,7 +94,7 @@ namespace com.jbg.content.scene
             this.AddUpdateFunc(() =>
             {
                 this.waitTime += Time.deltaTime;
-                if (this.waitTime >= 1f)
+                if (this.waitTime >= MainScene.WAIT_TIME)
                     this.SetStateDestroyMatched();
             });
         }
@@ -118,7 +120,7 @@ namespace com.jbg.content.scene
                 this.AddUpdateFunc(() =>
                 {
                     this.waitTime += Time.deltaTime;
-                    if (this.waitTime >= 1f)
+                    if (this.waitTime >= MainScene.WAIT_TIME)
                         this.SetStateProcessBlockMove();
                 });
             }
@@ -150,7 +152,7 @@ namespace com.jbg.content.scene
                 this.AddUpdateFunc(() =>
                 {
                     this.waitTime += Time.deltaTime;
-                    if (this.waitTime >= 1f)
+                    if (this.waitTime >= MainScene.WAIT_TIME)
                         this.SetStateProcessBlockMove();
                 });
             }
@@ -172,7 +174,7 @@ namespace com.jbg.content.scene
             this.AddUpdateFunc(() =>
             {
                 this.waitTime += Time.deltaTime;
-                if (this.waitTime >= 1f)
+                if (this.waitTime >= MainScene.WAIT_TIME)
                     this.SetStateCheckMatch();
             });
         }
