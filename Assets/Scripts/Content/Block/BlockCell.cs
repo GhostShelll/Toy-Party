@@ -28,6 +28,8 @@ namespace com.jbg.content.block
 
         private BlockCell[] surroundCells;  // 0:좌상단, 1:상단, 2:우상단, 3:좌하단, 4:하단, 5:우하단
 
+        private System.Action<string> onClickCallback;
+
         public string GetName()
         {
             return string.Format("{0}-{1}", this.colIndex, this.rowIndox);
@@ -46,12 +48,13 @@ namespace com.jbg.content.block
             this.surroundCells = surroundCells;
         }
 
-        public void Initialize(int col, int row, bool isEnable)
+        public void Initialize(int col, int row, bool isEnable, System.Action<string> onClickCallback)
         {
             this.colIndex = col;
             this.rowIndox = row;
             this.isEnable = isEnable;
             this.isNeedDestroy = false;
+            this.onClickCallback = onClickCallback;
 
             if (isEnable)
             {
@@ -181,6 +184,11 @@ namespace com.jbg.content.block
             trans.SetParent(this.transform);
             trans.name = this.GetName();
             trans.localPosition = Vector3.zero;
+        }
+
+        public void OnClickBlockCell()
+        {
+            this.onClickCallback?.Invoke(this.GetName());
         }
 
 #if UNITY_EDITOR

@@ -4,6 +4,7 @@ using com.jbg.content.block;
 using com.jbg.content.popup;
 using com.jbg.content.scene.view;
 using com.jbg.core.scene;
+using com.jbg.core.manager;
 
 namespace com.jbg.content.scene
 {
@@ -70,7 +71,7 @@ namespace com.jbg.content.scene
 
             this.sceneView.SetStateInitialize();
 
-            BlockManager.Instance.Initialize();
+            BlockManager.Instance.Initialize(this.OnClickBlockCell);
 
             this.SetStateCheckMatch();
         }
@@ -145,6 +146,16 @@ namespace com.jbg.content.scene
             this.SetState((int)STATE.ProcessDone);
 
             this.sceneView.SetStateProcessDone();
+        }
+
+        private void OnClickBlockCell(string cellName)
+        {
+            if (this.State != (int)STATE.ProcessDone)
+                return;
+
+            SoundManager.Inst.Play(SoundManager.SOUND_YES);
+
+            Debug.Log(cellName);
         }
     }
 }

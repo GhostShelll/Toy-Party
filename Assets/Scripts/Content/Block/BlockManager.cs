@@ -159,7 +159,7 @@ namespace com.jbg.content.block
             return this.blockLineSprites[(int)color];
         }
 
-        public void Initialize()
+        public void Initialize(System.Action<string> onClickCallback)
         {
             Transform cached = this.CachedTransform;
 
@@ -178,7 +178,7 @@ namespace com.jbg.content.block
                     bool isEnableCell = mapInfo.Contains(cellName);
 
                     this.blockMap[i][j] = child.GetChild(j).FindComponent<BlockCell>();
-                    this.blockMap[i][j].Initialize(i, j, isEnableCell);
+                    this.blockMap[i][j].Initialize(i, j, isEnableCell, onClickCallback);
                 }
             }
 
