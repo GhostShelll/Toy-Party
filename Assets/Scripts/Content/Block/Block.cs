@@ -39,6 +39,23 @@ namespace com.jbg.content.block
             GameObject.Destroy(this.gameObject);
         }
 
+        //// 앞 레이어의 이미지 회전
+        //switch (type)
+        //{
+        //    case Manager.BlkType.Normal:
+        //    case Manager.BlkType.Pack:
+        //        break;
+
+        //    case Manager.BlkType.Line6to12: this.imgDebugForward.transform.localEulerAngles = Vector3.zero; break;
+        //    case Manager.BlkType.Line1to7: this.imgDebugForward.transform.localEulerAngles = new Vector3(0f, 0f, -45f); break;
+        //    case Manager.BlkType.Line3to9: this.imgDebugForward.transform.localEulerAngles = new Vector3(0f, 0f, 90f); break;
+        //    case Manager.BlkType.Line5to11: this.imgDebugForward.transform.localEulerAngles = new Vector3(0f, 0f, 45f); break;
+
+        //    case Manager.BlkType.UFO:
+        //    case Manager.BlkType.Turtle:
+        //        break;
+        //}
+
 #if UNITY_EDITOR
         protected override void OnSetComponent()
         {
