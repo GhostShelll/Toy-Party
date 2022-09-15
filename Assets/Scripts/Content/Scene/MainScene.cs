@@ -1,26 +1,31 @@
 using UnityEngine;
 
-using com.jbg.asset;
-using com.jbg.asset.control;
-using com.jbg.asset.data;
+using com.jbg.content.block;
 using com.jbg.content.popup;
 using com.jbg.content.scene.view;
-using com.jbg.core;
-using com.jbg.core.manager;
 using com.jbg.core.scene;
+using com.jbg.core.manager;
 
 namespace com.jbg.content.scene
 {
     public class MainScene : SceneEx
     {
+        private const float WAIT_TIME = 1f;
+
         private MainView sceneView;
 
         public enum STATE
         {
-            CheckAsset,
-            DownloadAsset,
-            WaitDone,
+            Initialize,
+            CheckMatch,
+            DestroyMatched,
+            ProcessBlockMove,
+            ProcessBlockSwap,
+            ProcessDone,
         }
+
+        private float waitTime;
+        private bool blockSwapOn;
 
         protected override void OnOpen()
         {
@@ -28,38 +33,33 @@ namespace com.jbg.content.scene
 
             this.sceneView = (MainView)this.SceneView;
 
-            this.sceneView.BindEvent(MainView.Event.LottoSelect, this.OnClickLottoSelect);
-            this.sceneView.BindEvent(MainView.Event.RefreshAsset, this.OnClickRefreshAsset);
-            this.sceneView.BindEvent(MainView.Event.ChangeLanguage, this.OnClickChangeLanguage);
-
             MainView.Params p = new();
-            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_LOTTO_BTN_TEXT);
-            p.checkAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_CHECKING_TEXT);
-            p.downloadAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
-            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
-            p.languagesList = new() { "한국어", "English" };
+            p.initializeTxt = "**초기화 중";
+            p.checkMatchTxt = "**매칭 검사 중";
+            p.destroyMatchedTxt = "**매칭된 블럭 삭제 중";
+            p.processBlockMoveTxt = "**블럭 이동 중";
+            p.processBlockSwapTxt = "**선택된 블럭 위치 변경 중";
+            p.processDoneTxt = "**입력 대기 중";
 
             this.sceneView.OnOpen(p);
-            this.sceneView.SetLanguageState((int)LocaleControl.LanguageCode);
 
-            this.SetStateCheckAsset();
+            this.waitTime = 0f;
+            this.blockSwapOn = false;
+
+            this.SetStateInitialize();
         }
 
         protected override void OnClose()
         {
             base.OnClose();
-
-            this.sceneView.RemoveEvent(MainView.Event.LottoSelect);
-            this.sceneView.RemoveEvent(MainView.Event.RefreshAsset);
-            this.sceneView.RemoveEvent(MainView.Event.ChangeLanguage);
         }
 
         protected override void OnBack()
         {
             base.OnBack();
 
-            string title = LocaleControl.GetString(LocaleCodes.QUIT_POPUP_TITLE);
-            string message = LocaleControl.GetString(LocaleCodes.QUIT_POPUP_MSG);
+            string title = "**종료";
+            string message = "**종료하시겠습니까?";
             PopupAssist.OpenNoticeTwoBtnPopup(title, message, (popup) =>
             {
                 if (popup.IsOK)
@@ -71,117 +71,131 @@ namespace com.jbg.content.scene
             });
         }
 
-        private void SetStateCheckAsset()
+        private void SetStateInitialize()
         {
-            this.SetState((int)STATE.CheckAsset);
+            this.SetState((int)STATE.Initialize);
 
-            this.sceneView.SetStateCheckAsset();
+            this.sceneView.SetStateInitialize();
 
-            // 에셋 체크 시작
-            Coroutine task = CoroutineManager.AddTask(TableVersionControl.CheckAsset());
+            BlockManager.Instance.Initialize(this.OnClickBlockCell);
 
+            this.SetStateCheckMatch();
+        }
+
+        private void SetStateCheckMatch()
+        {
+            this.SetState((int)STATE.CheckMatch);
+
+            this.sceneView.SetStateCheckMatch();
+
+            BlockManager.Instance.CheckMatch();
+
+            this.waitTime = 0f;
             this.AddUpdateFunc(() =>
             {
-                if (TableVersionControl.CheckDone)
-                {
-                    // 에셋 체크 완료함
-                    if (task != null)
-                        CoroutineManager.RemoveTask(task);
-
-                    this.SetStateDownloadAsset();
-                }
-                else
-                {
-                    // 에셋 체크 중
-                    float currentProgress = TableVersionControl.GetRequestProgress();
-
-                    this.sceneView.UpdateCheckAsset(currentProgress);
-                }
+                this.waitTime += Time.deltaTime;
+                if (this.waitTime >= MainScene.WAIT_TIME)
+                    this.SetStateDestroyMatched();
             });
         }
 
-        private void SetStateDownloadAsset()
+        private void SetStateDestroyMatched()
         {
-            this.SetState((int)STATE.DownloadAsset);
+            this.SetState((int)STATE.DestroyMatched);
 
-            // 에셋 로드 시작
-            Coroutine task = CoroutineManager.AddTask(AssetManager.DownloadAsset());
+            this.sceneView.SetStateDestroyMatched();
 
+            bool cellDestroyed = BlockManager.Instance.DestroyMatched();
+
+            if (cellDestroyed)
+            {
+                if (this.blockSwapOn)
+                {
+                    this.blockSwapOn = false;
+
+                    BlockManager.Instance.DisableBlockSwap();
+                }
+
+                this.waitTime = 0f;
+                this.AddUpdateFunc(() =>
+                {
+                    this.waitTime += Time.deltaTime;
+                    if (this.waitTime >= MainScene.WAIT_TIME)
+                        this.SetStateProcessBlockMove();
+                });
+            }
+            else
+            {
+                if (this.blockSwapOn)
+                {
+                    this.blockSwapOn = false;
+
+                    BlockManager.Instance.ProcessBlockSwap();
+                    BlockManager.Instance.DisableBlockSwap();
+                }
+
+                this.SetStateProcessDone();
+            }
+        }
+
+        private void SetStateProcessBlockMove()
+        {
+            this.SetState((int)STATE.ProcessBlockMove);
+
+            this.sceneView.SetStateProcessBlockMove();
+
+            bool isMoved = BlockManager.Instance.ProcessBlockMove();
+
+            if (isMoved)
+            {
+                this.waitTime = 0f;
+                this.AddUpdateFunc(() =>
+                {
+                    this.waitTime += Time.deltaTime;
+                    if (this.waitTime >= MainScene.WAIT_TIME)
+                        this.SetStateProcessBlockMove();
+                });
+            }
+            else
+            {
+                this.SetStateCheckMatch();
+            }
+        }
+
+        private void SetStateProcessBlockSwap()
+        {
+            this.SetState((int)STATE.ProcessBlockSwap);
+
+            this.sceneView.SetStateProcessBlockSwap();
+
+            this.blockSwapOn = BlockManager.Instance.ProcessBlockSwap();
+
+            this.waitTime = 0f;
             this.AddUpdateFunc(() =>
             {
-                if (AssetManager.DownloadDone)
-                {
-                    // 에셋 로드 완료함
-                    if (task != null)
-                        CoroutineManager.RemoveTask(task);
-
-                    this.SetStateWaitDone();
-                }
-                else
-                {
-                    // 에셋 로드중
-                    string currentAsset = AssetManager.CurrentAsset;
-                    float currentProgress = AssetManager.GetRequestProgress();
-
-                    this.sceneView.UpdateDownloadAsset(currentAsset, currentProgress);
-                }
+                this.waitTime += Time.deltaTime;
+                if (this.waitTime >= MainScene.WAIT_TIME)
+                    this.SetStateCheckMatch();
             });
         }
 
-        private void SetStateWaitDone()
+        private void SetStateProcessDone()
         {
-            this.SetState((int)STATE.WaitDone);
+            this.SetState((int)STATE.ProcessDone);
 
-            this.sceneView.SetStateWaitDone();
+            this.sceneView.SetStateProcessDone();
         }
 
-        private void OnClickLottoSelect(int eventNum, object obj)
+        private void OnClickBlockCell(string cellName)
         {
-            SoundManager.Inst.Play(SoundManager.SOUND_YES);
-
-            LottoPopupAssist.Open(() =>
-            {
-
-            });
-        }
-
-        private void OnClickRefreshAsset(int eventNum, object obj)
-        {
-            SoundManager.Inst.Play(SoundManager.SOUND_YES);
-
-            // 에셋 갱신 시작
-            this.SetStateCheckAsset();
-        }
-
-        private void OnClickChangeLanguage(int eventNum, object obj)
-        {
-            SoundManager.Inst.Play(SoundManager.SOUND_YES);
-
-            bool parse = int.TryParse(obj.ToString(), out int option);
-            if (parse == false)
-            {
-                DebugEx.LogColor("MAIN_SCENE PARSE ERROR", "red");
+            if (this.State != (int)STATE.ProcessDone)
                 return;
-            }
 
-            bool isDefined = System.Enum.IsDefined(typeof(LocaleControl.Language), option);
-            if (isDefined == false)
-            {
-                DebugEx.LogColor("MAIN_SCENE new option is not defined. Option : " + option, "red");
-                return;
-            }
+            SoundManager.Inst.Play(SoundManager.SOUND_YES);
 
-            LocaleControl.Language newLanguageCode = (LocaleControl.Language)option;
-            DebugEx.Log("MAIN_SCENE new option is " + newLanguageCode.ToString());
-            LocaleControl.LanguageCode = newLanguageCode;
-
-            MainView.Params p = this.sceneView.ParamBuffer;
-            p.lottoBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_LOTTO_BTN_TEXT);
-            p.checkAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_CHECKING_TEXT);
-            p.downloadAssetTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_TEXT);
-            p.refreshBtnTxt = LocaleControl.GetString(LocaleCodes.MAIN_SCENE_ASSET_LOADING_BTN_TEXT);
-
-            this.sceneView.UpdateTextUI();
+            bool cellSwapReady = BlockManager.Instance.OnClickBlockCell(cellName);
+            if (cellSwapReady)
+                this.SetStateProcessBlockSwap();
         }
     }
 }

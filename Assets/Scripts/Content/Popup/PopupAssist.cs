@@ -1,7 +1,5 @@
 using UnityEngine;
 
-using com.jbg.asset.control;
-using com.jbg.asset.data;
 using com.jbg.core.popup;
 
 namespace com.jbg.content.popup
@@ -38,7 +36,7 @@ namespace com.jbg.content.popup
             Popup.Params p = new();
             p.title = title;
             p.message = message;
-            p.btnOkText = LocaleControl.GetString(LocaleCodes.BTN_OK);
+            p.btnOkText = "**OK";
 
             return Assist.OpenPopup("Popup_Notice_1Btn", p, resultCallback);
         }
@@ -48,8 +46,8 @@ namespace com.jbg.content.popup
             Popup.Params p = new();
             p.title = title;
             p.message = message;
-            p.btnOkText = LocaleControl.GetString(LocaleCodes.BTN_OK);
-            p.btnCancelText = LocaleControl.GetString(LocaleCodes.BTN_CANCEL);
+            p.btnOkText = "**OK";
+            p.btnCancelText = "**Cancel";
 
             return Assist.OpenPopup("Popup_Notice_2Btn", p, resultCallback);
         }

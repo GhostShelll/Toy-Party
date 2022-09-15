@@ -1,30 +1,21 @@
-using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.UI;
 
 using com.jbg.core;
 using com.jbg.core.scene;
-using com.jbg.asset.control;
 
 namespace com.jbg.content.scene.view
 {
     public class MainView : SceneView
     {
-        public enum Event
-        {
-            LottoSelect,
-            RefreshAsset,
-            ChangeLanguage,
-        };
-
         public class Params
         {
-            public string lottoBtnTxt;
-            public string checkAssetTxt;
-            public string downloadAssetTxt;
-            public string refreshBtnTxt;
-            public List<string> languagesList;
+            public string initializeTxt;
+            public string checkMatchTxt;
+            public string destroyMatchedTxt;
+            public string processBlockMoveTxt;
+            public string processBlockSwapTxt;
+            public string processDoneTxt;
         }
 
         private Params paramBuffer = null;
@@ -32,114 +23,53 @@ namespace com.jbg.content.scene.view
 
         [Header("Main View")]
         [SerializeField]
-        ButtonComponent lottoBtn;
-
-        [SerializeField]
-        GameObject progressObj;
-        [SerializeField]
-        Image progress;
-        [SerializeField]
-        Text progressTxt;
-
-        [SerializeField]
-        ButtonComponent refreshBtn;
-
-        [SerializeField]
-        Dropdown languageBtn;
-
-        private int dotCount = 1;
+        Text stateTxt;
 
         public void OnOpen(Params p)
         {
             this.paramBuffer = p;
-
-            this.UpdateTextUI();
-
-            this.progress.fillAmount = 0f;
-            this.progressTxt.text = string.Empty;
-
-            for (int i = 0; i < p.languagesList.Count; i++)
-                this.languageBtn.options.Add(new(p.languagesList[i]));
-            this.languageBtn.onValueChanged.AddListener(this.OnClickChangeLanguage);
         }
 
-        public void UpdateTextUI()
+        public void SetStateInitialize()
         {
             Params p = this.paramBuffer;
 
-            this.lottoBtn.Text = p.lottoBtnTxt;
-            this.refreshBtn.Text = p.refreshBtnTxt;
+            this.stateTxt.text = p.initializeTxt;
         }
 
-        public void SetStateCheckAsset()
-        {
-            this.lottoBtn.GameObject.SetActive(false);
-            this.progressObj.SetActive(true);
-            this.refreshBtn.Interactable = false;
-            this.languageBtn.interactable = false;
-        }
-
-        public void SetStateWaitDone()
-        {
-            this.lottoBtn.GameObject.SetActive(true);
-            this.progressObj.SetActive(false);
-            this.refreshBtn.Interactable = true;
-            this.languageBtn.interactable = true;
-        }
-
-        public void UpdateCheckAsset(float progress)
+        public void SetStateCheckMatch()
         {
             Params p = this.paramBuffer;
 
-            this.progress.fillAmount = progress;
-
-            string checkAssetTxt = p.checkAssetTxt;
-            for (int i = 0; i < this.dotCount; i++)
-                checkAssetTxt += '.';
-
-            this.dotCount++;
-            if (this.dotCount > 3)
-                this.dotCount = 1;
-
-            this.progressTxt.text = checkAssetTxt;
+            this.stateTxt.text = p.checkMatchTxt;
         }
 
-        public void UpdateDownloadAsset(string assetName, float progress)
+        public void SetStateDestroyMatched()
         {
             Params p = this.paramBuffer;
 
-            this.progress.fillAmount = progress;
-
-            string downloadAssetTxt = string.Format(p.downloadAssetTxt, assetName);
-            for (int i = 0; i < this.dotCount; i++)
-                downloadAssetTxt += '.';
-
-            this.dotCount++;
-            if (this.dotCount > 3)
-                this.dotCount = 1;
-
-            this.progressTxt.text = downloadAssetTxt;
+            this.stateTxt.text = p.destroyMatchedTxt;
         }
 
-        public void SetLanguageState(int optionNum)
+        public void SetStateProcessBlockMove()
         {
-            this.languageBtn.SetValueWithoutNotify(optionNum);
-            this.languageBtn.RefreshShownValue();
+            Params p = this.paramBuffer;
+
+            this.stateTxt.text = p.processBlockMoveTxt;
         }
 
-        public void OnClickLottoSelect()
+        public void SetStateProcessBlockSwap()
         {
-            this.DoEvent(Event.LottoSelect);
+            Params p = this.paramBuffer;
+
+            this.stateTxt.text = p.processBlockSwapTxt;
         }
 
-        public void OnClickRefreshAsset()
+        public void SetStateProcessDone()
         {
-            this.DoEvent(Event.RefreshAsset);
-        }
+            Params p = this.paramBuffer;
 
-        public void OnClickChangeLanguage(int option)
-        {
-            this.DoEvent(Event.ChangeLanguage, option);
+            this.stateTxt.text = p.processDoneTxt;
         }
 
 #if UNITY_EDITOR
@@ -150,19 +80,8 @@ namespace com.jbg.content.scene.view
             Transform cached = this.CachedTransform.Find("Canvas/Padding");
             Transform t;
 
-            t = cached.Find("BtnLottoSelect");
-            this.lottoBtn = new ButtonComponent(t);
-
-            t = cached.Find("ProgressSlider");
-            this.progressObj = t.gameObject;
-            this.progress = t.FindComponent<Image>("Fill");
-            this.progressTxt = t.FindComponent<Text>("Text");
-
-            t = cached.Find("BtnRefresh");
-            this.refreshBtn = new ButtonComponent(t);
-
-            t = cached.Find("BtnLanguage");
-            this.languageBtn = t.GetComponent<Dropdown>();
+            t = cached.Find("Top");
+            this.stateTxt = t.FindComponent<Text>("TextState");
         }
 #endif  // UNITY_EDITOR
     }
