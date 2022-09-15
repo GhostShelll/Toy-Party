@@ -5,7 +5,3 @@
 
 ## Unity Version
 2021.3.4f1
-
-## Version Info
-### 0.1.0
-- 작업 진행중
