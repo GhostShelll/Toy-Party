@@ -263,7 +263,7 @@ namespace com.jbg.content.block
                     if (cell.IsNeedDestroy == false)
                         continue;
 
-                    cell.DestroyBlock();
+                    cell.DestroyMatched();
 
                     if (cellDestroyed == false)
                         cellDestroyed = true;
@@ -327,63 +327,6 @@ namespace com.jbg.content.block
             if (this.highlightCell2 != null)
                 this.highlightCell2.SetHighlight(false);
             this.highlightCell2 = null;
-        }
-
-        public bool CheckMatchPossible()
-        {
-            for (int i = 0; i < this.blockMap.Length; i++)
-            {
-                BlockCell[] columns = this.blockMap[i];
-
-                for (int j = 0; j < columns.Length; j++)
-                {
-                    BlockCell cell = columns[j];
-                    if (cell.IsEnable == false)
-                        continue;
-                    if (cell.IsEmpty)
-                        continue;
-
-                    bool enableMatch = cell.CheckMatchPossible();
-                    if (enableMatch)
-                        return true;
-                }
-            }
-
-            // 매칭 가능한 블럭이 없으므로 모든 블럭 삭제
-            for (int i = 0; i < this.blockMap.Length; i++)
-            {
-                BlockCell[] columns = this.blockMap[i];
-
-                for (int j = 0; j < columns.Length; j++)
-                {
-                    BlockCell cell = columns[j];
-                    if (cell.IsEnable == false)
-                        continue;
-                    if (cell.IsEmpty)
-                        continue;
-
-                    cell.DestroyBlock();
-                }
-            }
-
-            return false;
-        }
-
-        public void ProcessBlockAllSwap()
-        {
-            for (int i = 0; i < this.blockMap.Length; i++)
-            {
-                BlockCell[] columns = this.blockMap[i];
-
-                for (int j = 0; j < columns.Length; j++)
-                {
-                    BlockCell cell = columns[j];
-                    if (cell.IsEnable == false)
-                        continue;
-
-                    cell.SetNewBlock();
-                }
-            }
         }
 
         public bool OnClickBlockCell(string cellName)

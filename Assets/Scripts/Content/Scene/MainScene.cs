@@ -10,8 +10,6 @@ namespace com.jbg.content.scene
 {
     public class MainScene : SceneEx
     {
-        private const float WAIT_TIME = 0.1f;
-
         private MainView sceneView;
 
         public enum STATE
@@ -21,8 +19,6 @@ namespace com.jbg.content.scene
             DestroyMatched,
             ProcessBlockMove,
             ProcessBlockSwap,
-            CheckMatchPossible,
-            ProcessBlockAllSwap,
             ProcessDone,
         }
 
@@ -41,8 +37,6 @@ namespace com.jbg.content.scene
             p.destroyMatchedTxt = "**매칭된 블럭 삭제 중";
             p.processBlockMoveTxt = "**블럭 이동 중";
             p.processBlockSwapTxt = "**선택된 블럭 위치 변경 중";
-            p.checkMatchPossibleTxt = "**플레이 지속 가능 여부 검사 중";
-            p.processBlockAllSwapTxt = "**전체 블럭 재배치 진행 중";
             p.processDoneTxt = "**입력 대기 중";
 
             this.sceneView.OnOpen(p);
@@ -98,7 +92,7 @@ namespace com.jbg.content.scene
             this.AddUpdateFunc(() =>
             {
                 this.waitTime += Time.deltaTime;
-                if (this.waitTime >= MainScene.WAIT_TIME)
+                if (this.waitTime >= 1f)
                     this.SetStateDestroyMatched();
             });
         }
@@ -124,7 +118,7 @@ namespace com.jbg.content.scene
                 this.AddUpdateFunc(() =>
                 {
                     this.waitTime += Time.deltaTime;
-                    if (this.waitTime >= MainScene.WAIT_TIME)
+                    if (this.waitTime >= 1f)
                         this.SetStateProcessBlockMove();
                 });
             }
@@ -138,7 +132,7 @@ namespace com.jbg.content.scene
                     BlockManager.Instance.DisableBlockSwap();
                 }
 
-                this.SetStateCheckMatchPossible();
+                this.SetStateProcessDone();
             }
         }
 
@@ -156,7 +150,7 @@ namespace com.jbg.content.scene
                 this.AddUpdateFunc(() =>
                 {
                     this.waitTime += Time.deltaTime;
-                    if (this.waitTime >= MainScene.WAIT_TIME)
+                    if (this.waitTime >= 1f)
                         this.SetStateProcessBlockMove();
                 });
             }
@@ -178,47 +172,7 @@ namespace com.jbg.content.scene
             this.AddUpdateFunc(() =>
             {
                 this.waitTime += Time.deltaTime;
-                if (this.waitTime >= MainScene.WAIT_TIME)
-                    this.SetStateCheckMatch();
-            });
-        }
-
-        private void SetStateCheckMatchPossible()
-        {
-            this.SetState((int)STATE.CheckMatchPossible);
-
-            this.sceneView.SetStateCheckMatchPossible();
-
-            bool enableMatch = BlockManager.Instance.CheckMatchPossible();
-            if (enableMatch)
-            {
-                this.SetStateProcessDone();
-            }
-            else
-            {
-                this.waitTime = 0f;
-                this.AddUpdateFunc(() =>
-                {
-                    this.waitTime += Time.deltaTime;
-                    if (this.waitTime >= MainScene.WAIT_TIME)
-                        this.SetStateProcessBlockAllSwap();
-                });
-            }
-        }
-
-        private void SetStateProcessBlockAllSwap()
-        {
-            this.SetState((int)STATE.ProcessBlockAllSwap);
-
-            this.sceneView.SetStateProcessBlockAllSwap();
-
-            BlockManager.Instance.ProcessBlockAllSwap();
-
-            this.waitTime = 0f;
-            this.AddUpdateFunc(() =>
-            {
-                this.waitTime += Time.deltaTime;
-                if (this.waitTime >= MainScene.WAIT_TIME)
+                if (this.waitTime >= 1f)
                     this.SetStateCheckMatch();
             });
         }
