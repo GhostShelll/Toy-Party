@@ -13,6 +13,7 @@ namespace com.jbg.content.scene
             Initialize,
             CheckMatch,
             DestroyMatched,
+            ProcessBlockMove,
             ProcessDone,
         }
 
@@ -68,7 +69,7 @@ namespace com.jbg.content.scene
             this.AddUpdateFunc(() =>
             {
                 this.waitTime += Time.deltaTime;
-                if (this.waitTime >= 0.5f)
+                if (this.waitTime >= 1f)
                     this.SetStateDestroyMatched();
             });
         }
@@ -77,15 +78,44 @@ namespace com.jbg.content.scene
         {
             this.SetState((int)STATE.DestroyMatched);
 
-            BlockManager.Instance.DestroyMatched();
+            bool cellDestroyed = BlockManager.Instance.DestroyMatched();
 
-            this.waitTime = 0f;
-            this.AddUpdateFunc(() =>
+            if (cellDestroyed)
             {
-                this.waitTime += Time.deltaTime;
-                if (this.waitTime >= 0.5f)
-                    this.SetStateProcessDone();
-            });
+                this.waitTime = 0f;
+                this.AddUpdateFunc(() =>
+                {
+                    this.waitTime += Time.deltaTime;
+                    if (this.waitTime >= 1f)
+                        this.SetStateProcessBlockMove();
+                });
+            }
+            else
+            {
+                this.SetStateProcessDone();
+            }
+        }
+
+        private void SetStateProcessBlockMove()
+        {
+            this.SetState((int)STATE.ProcessBlockMove);
+
+            bool isMoved = BlockManager.Instance.ProcessBlockMove();
+
+            if (isMoved)
+            {
+                this.waitTime = 0f;
+                this.AddUpdateFunc(() =>
+                {
+                    this.waitTime += Time.deltaTime;
+                    if (this.waitTime >= 1f)
+                        this.SetStateProcessBlockMove();
+                });
+            }
+            else
+            {
+                this.SetStateCheckMatch();
+            }
         }
 
         private void SetStateProcessDone()

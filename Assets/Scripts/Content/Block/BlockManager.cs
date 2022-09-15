@@ -232,16 +232,16 @@ namespace com.jbg.content.block
                     BlockCell cell = columns[j];
                     if (cell.IsEnable == false)
                         continue;
-                    if (cell.IsChecked)
-                        continue;
 
                     cell.CheckMatch();
                 }
             }
         }
 
-        public void DestroyMatched()
+        public bool DestroyMatched()
         {
+            bool cellDestroyed = false;
+
             for (int i = 0; i < this.blockMap.Length; i++)
             {
                 BlockCell[] columns = this.blockMap[i];
@@ -255,8 +255,40 @@ namespace com.jbg.content.block
                         continue;
 
                     cell.DestroyMatched();
+
+                    if (cellDestroyed == false)
+                        cellDestroyed = true;
                 }
             }
+
+            return cellDestroyed;
+        }
+
+        public bool ProcessBlockMove()
+        {
+            bool isMoved = false;
+
+            for (int i = 0; i < this.blockMap.Length; i++)
+            {
+                BlockCell[] columns = this.blockMap[i];
+
+                for (int j = 0; j < columns.Length; j++)
+                {
+                    BlockCell cell = columns[j];
+                    if (cell.IsEnable == false)
+                        continue;
+                    if (cell.IsEmpty == false)
+                        continue;
+
+                    bool oneStep = cell.ProcessBlockMove();
+                    isMoved |= oneStep;
+
+                    if (oneStep)
+                        break;
+                }
+            }
+
+            return isMoved;
         }
 
 #if UNITY_EDITOR

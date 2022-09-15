@@ -12,10 +12,6 @@ namespace com.jbg.content.block
         [Header("Block Cell")]
         [SerializeField]
         Image imgBg;
-        [SerializeField]
-        Image imgDebug;
-        [SerializeField]
-        Image imgDebugForward;
 
         private int colIndex;
         private int rowIndox;
@@ -23,14 +19,12 @@ namespace com.jbg.content.block
         private bool isEnable;
         public bool IsEnable { get { return this.isEnable; } }
 
-        private bool isChecked;
-        public bool IsChecked { get { return this.isChecked; } }
-
         private bool isNeedDestroy;
         public bool IsNeedDestroy { get { return this.isNeedDestroy; } set { this.isNeedDestroy = value; } }
 
         private Block block;
-        public Block Block { get { return this.block; } }
+        public Block Block { get { return this.block; } set { this.block = value; } }
+        public bool IsEmpty { get { return this.block == null; } }
 
         private BlockCell[] surroundCells;  // 0:좌상단, 1:상단, 2:우상단, 3:좌하단, 4:하단, 5:우하단
 
@@ -57,7 +51,6 @@ namespace com.jbg.content.block
             this.colIndex = col;
             this.rowIndox = row;
             this.isEnable = isEnable;
-            this.isChecked = false;
             this.isNeedDestroy = false;
 
             if (isEnable)
@@ -70,31 +63,18 @@ namespace com.jbg.content.block
                 this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
 
                 this.imgBg.canvasRenderer.SetAlpha(1f);
-#if LOG_DEBUG
-                this.imgDebug.enabled = true;
-                this.imgDebug.sprite = blkImg;
-                this.imgDebugForward.enabled = false;
-#else   // LOG_DEBUG
-                this.imgDebug.enabled = false;
-                this.imgDebugForward.enabled = false;
-#endif  // LOG_DEBUG
             }
             else
             {
                 this.block = null;
 
                 this.imgBg.canvasRenderer.SetAlpha(0.2f);
-
-                this.imgDebug.enabled = false;
-                this.imgDebugForward.enabled = false;
             }
         }
 
         public void CheckMatch()
         {
             Manager.BlkColor thisColor = this.block.Color;
-
-            this.isChecked = true;
 
             // 현재의 Cell을 중점으로 두고 세 방향으로 검사하여 3개가 매칭되었는지 검사
             BlockCell cellLT = this.surroundCells[0];
@@ -141,42 +121,66 @@ namespace com.jbg.content.block
             if (this.block != null)
                 this.block.DoDestroy();
 
+            this.isNeedDestroy = false;
             this.block = null;
-
-            this.imgDebug.enabled = false;
-            this.imgDebugForward.enabled = false;
         }
 
-        public void SetBlock(Manager.BlkColor color, Sprite mainImg, Manager.BlkType type, Sprite forwardImg)
+        public bool ProcessBlockMove()
         {
-#if LOG_DEBUG
-            this.imgDebug.sprite = mainImg;
+            // 상단에 위치한 Cell 중에서 북, 북서, 북동 순으로 검사
+            BlockCell[] topCells = new BlockCell[3] { this.surroundCells[1], this.surroundCells[0], this.surroundCells[2] };
 
-            this.imgDebugForward.enabled = forwardImg != null;
-            if (forwardImg != null)
+            for (int i = 0; i < topCells.Length; i++)
             {
-                this.imgDebugForward.sprite = forwardImg;
+                BlockCell cell = topCells[i];
 
-                // 앞 레이어의 이미지 회전
-                switch (type)
+                if (cell != null && cell.IsEnable && cell.IsEmpty == false)
                 {
-                    case Manager.BlkType.Normal:
-                    case Manager.BlkType.Pack:
-                        break;
+                    this.SetBlock(cell.Block);
+                    cell.Block = null;
+                    cell.ProcessBlockMove();
 
-                    case Manager.BlkType.Line6to12: this.imgDebugForward.transform.localEulerAngles = Vector3.zero; break;
-                    case Manager.BlkType.Line1to7: this.imgDebugForward.transform.localEulerAngles = new Vector3(0f, 0f, -45f); break;
-                    case Manager.BlkType.Line3to9: this.imgDebugForward.transform.localEulerAngles = new Vector3(0f, 0f, 90f); break;
-                    case Manager.BlkType.Line5to11: this.imgDebugForward.transform.localEulerAngles = new Vector3(0f, 0f, 45f); break;
-
-                    case Manager.BlkType.UFO:
-                    case Manager.BlkType.Turtle:
-                        break;
+                    return true;
                 }
             }
-#endif  // LOG_DEBUG
 
+            bool nonTopCell = true;
 
+            for (int i = 0; i < topCells.Length; i++)
+            {
+                BlockCell cell = topCells[i];
+
+                if (cell != null && cell.IsEnable)
+                {
+                    nonTopCell = false;
+                    break;
+                }
+            }
+
+            if (nonTopCell)
+            {
+                this.block = Manager.Instance.LoadBlock(this);
+
+                Manager.BlkColor color = Manager.Instance.GetRandomColor();
+                Sprite blkImg = Manager.Instance.GetNormalSprite(color);
+
+                this.block.Initialize(color, Manager.BlkType.Normal, blkImg);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void SetBlock(Block block)
+        {
+            this.block = block;
+
+            Transform trans = this.block.transform;
+
+            trans.SetParent(this.transform);
+            trans.name = this.GetName();
+            trans.localPosition = Vector3.zero;
         }
 
 #if UNITY_EDITOR
@@ -189,10 +193,6 @@ namespace com.jbg.content.block
 
             t = cached.Find("Bg");
             this.imgBg = t.GetComponent<Image>();
-
-            t = cached.Find("DebugImage");
-            this.imgDebug = t.FindComponent<Image>("Main");
-            this.imgDebugForward = t.FindComponent<Image>("Forward");
         }
 #endif  // UNITY_EDITOR
     }
